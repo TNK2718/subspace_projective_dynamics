@@ -6,8 +6,7 @@ import math
 
 np.set_printoptions(linewidth=2000)
 
-default_flag_type = "spring"
-
+'''https://github.com/TanaTanoi/lets-get-physical-simluation'''
 
 class PDModel:
     def __init__(self, verts, faces, uvs=[], constraints=[], dyn_forces=[]):

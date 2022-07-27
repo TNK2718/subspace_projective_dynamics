@@ -5,7 +5,11 @@ import constraint
 import numpy.linalg as linalg
 import numpy as np
 
-'''For geometry initialization. Building plane, loading obj file(TODO), etc.'''
+'''For geometry initialization.
+Building plane, loading obj file(TODO), etc.
+
+https://github.com/TanaTanoi/lets-get-physical-simluation
+'''
 def generate_plane(width, height, MAX_WIDTH_SIZE=500, MAX_HEIGHT_SIZE=300):
 
     n = width * height
