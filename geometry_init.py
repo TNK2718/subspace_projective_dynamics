@@ -10,7 +10,7 @@ Building plane, loading obj file(TODO), etc.
 
 https://github.com/TanaTanoi/lets-get-physical-simluation
 '''
-def generate_plane(width, height, MAX_WIDTH_SIZE=500, MAX_HEIGHT_SIZE=300):
+def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
 
     n = width * height
     width_gap = MAX_WIDTH_SIZE / width

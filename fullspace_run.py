@@ -49,48 +49,39 @@ def main(unused_argv):
     fig = plt.figure(figsize=(19.2, 10.8))
     ax = fig.add_subplot(111, projection='3d')
     skip = 10
-    num_steps = rollout_data[0]['gt_pos'].shape[0]
-    # print(num_steps)
+    num_steps = 500
     num_frames = num_steps
 
-    # compute bounds
-    bounds = []
-    index_temp = 0
-    for trajectory in rollout_data:
-        index_temp += 1
-        # print("bb_min shape", trajectory['gt_pos'].shape)
-        bb_min = torch.squeeze(
-            trajectory['gt_pos'], dim=0).cpu().numpy().min(axis=(0, 1))
-        bb_max = torch.squeeze(
-            trajectory['gt_pos'], dim=0).cpu().numpy().max(axis=(0, 1))
-        bounds.append((bb_min, bb_max))
+    # Setup solvers
+    models = []
+
+    # flag
+    res_w = 50
+    res_h = 30
+    len_w = 0.5
+    len_h = 0.3
+    models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
+
 
     def animate(num):
         step = (num * skip) % num_steps
-        traj = (num * skip) // num_steps
-        # traj = (num * 3) // num_steps
-        # step = (num * 3) % num_steps
+
         ax.cla()
-        bound = bounds[traj]
 
-        ax.set_xlim([bound[0][0], bound[1][0]])
-        ax.set_ylim([bound[0][1], bound[1][1]])
-        ax.set_zlim([bound[0][2], bound[1][2]])
+        ax.set_xlim([-1.0, 1.0])
+        ax.set_ylim([-1.0, 1.0])
+        ax.set_zlim([-1.0, 1.0])
 
-        pos = torch.squeeze(rollout_data[traj]['pred_pos'], dim=0)[
-            step].to('cpu')
-        original_pos = torch.squeeze(rollout_data[traj]['gt_pos'], dim=0)[
-            step].to('cpu')
-        # print(pos[10])
-        faces = torch.squeeze(rollout_data[traj]['faces'], dim=0)[
-            step].to('cpu')
-        ax.plot_trisurf(pos[:, 0], pos[:, 1], faces, pos[:, 2], shade=True)
-        ax.plot_trisurf(
-            original_pos[:, 0], original_pos[:, 1], faces, original_pos[:, 2], shade=True)
-        ax.set_title('Trajectory %d Step %d' % (traj, step))
+        for model in models:
+            vert = model.rendering_verts
+            faces = model.faces
+            ax.plot_trisurf(vert[:, 0], vert[:, 1], faces, vert[:, 2], shade=True)
+
+        ax.set_title('Step %d' % (step))
+
+        for model in models:
+            model.simulate()
         return fig,
-
-    print("Num of Trajectories", len(bounds))
 
     # ani = animation.FuncAnimation(fig, animate, frames=math.floor(num_frames * 0.1), interval=100)
     # ani = animation.FuncAnimation(fig, animate, interval=100)
