@@ -2,11 +2,13 @@ import numpy as np
 import numpy.linalg as linalg
 import face
 import constraint
+import potential
 import math
 
 np.set_printoptions(linewidth=2000)
 
 '''https://github.com/TanaTanoi/lets-get-physical-simluation'''
+
 
 class PDModel:
     def __init__(self, verts, faces, uvs=[], constraints=[], dyn_forces=[]):
@@ -28,14 +30,15 @@ class PDModel:
         self.stepsize = 0.3
         self.drag = 1.00
         self.max_iter = 30
-        self.eps_n = 0.001 # epsilon for local-global loop(nonlinear solver)
+        self.eps_n = 0.001  # epsilon for local-global loop(nonlinear solver)
 
         '''Variables'''
         self.count = 0
         self.position = verts.flatten()
         self.velocities = np.zeros((3 * self.n))
-        self.mass_matrix = np.identity(3 * self.n)
+        self.mass_matrix = np.identity(3 * self.n)  # TODO
         self.mass_matrix /= (len(self.faces))
+        self.inv_mass_matrix = np.identity(3 * self.n) # TODO
         self.global_matrix = self.calculate_triangle_global_matrix()
         self.dyn_forces = dyn_forces  # Dynamics external forces
         # Static external forces
@@ -47,11 +50,15 @@ class PDModel:
         # self.wind_magnitude = 5
 
         '''Constraints'''
+        #
+        self.potential_weight = 0.01
+        self.potentials = []
+        for face in self.faces:
+            self.potentials.append(potential.ARAPpotential(
+                self.n, self.verts, face, self.potential_weight, 1.0, 0.0))
+
+        #
         self.constraints = constraints
-        self.fixed_points = []
-        for con in self.constraints:
-            if con.type() == "FIXED":
-                self.fixed_points.append(con)
 
     def simulate(self):
         ''' Forces'''
@@ -64,7 +71,7 @@ class PDModel:
             linalg.inv(self.mass_matrix).dot(forces)
         inertia = self.velocities * self.stepsize
         s_0 = self.position + inertia + accel
-        
+
         '''Local global loop'''
         q_1 = np.copy(s_0)
         b_array = np.zeros((self.n + len(self.fixed_points), 3))
@@ -104,70 +111,28 @@ class PDModel:
 
         self.position = np.copy(q_1)
         self.velocities = ((q_1 - self.rendering_verts)) / self.stepsize
-        self.rendering_verts = q_1.reshape((self.n ,3))
-
-    def center(self):
-        middle_point = np.array((0., 0., 0.))
-        for vert in self.verts:
-            middle_point += vert
-        middle_point = middle_point / float(self.n)
-        middle_point *= -1
-        for vert_id in range(self.n):
-            self.verts[vert_id] += middle_point
-
-    def calculate_b_for_triangle(self, i, s_0):
-        b = np.zeros((1, 3))
-        for face in self.verts_to_tri[i]:
-            T = self.potential_for_triangle(face, s_0, i)
-            for o_v in face.other_points(i):
-                b += T.dot(self.verts[i] - self.verts[o_v])
-        return b
-
-    def potential_for_triangle(self, face, prime_verts, point):
-        other_points = face.other_points(point)
-        v1 = self.verts[point]
-        v2 = self.verts[other_points[0]]
-        v3 = self.verts[other_points[1]]
-        x_g = np.matrix((v3 - v1, v2 - v1, (0, 0, 0))).T
-
-        v1 = prime_verts[point]
-        v2 = prime_verts[other_points[0]]
-        v3 = prime_verts[other_points[1]]
-        x_f = np.matrix((v3 - v1, v2 - v1, (0, 0, 0))).T
-
-        combined = x_f.dot(np.linalg.pinv(x_g))
-        return self.clamped_svd_for_matrix(combined)
-
-    def clamped_svd_for_matrix(self, matrix):
-        u, s, v_t = np.linalg.svd(matrix)
-        s = np.diag(np.clip(s, 0, 1.0))
-        # return np.around(u.dot(s).dot(v_t), 11)
-        return u.dot(s).dot(v_t)
+        self.rendering_verts = q_1.reshape((self.n, 3))
 
     def calculate_triangle_global_matrix(self):
-        fixed_point_num = len(self.fixed_points)
-        M = np.zeros((self.n + fixed_point_num, self.n + fixed_point_num))
-        M[:self.n, :self.n] = self.mass_matrix
-        M /= (self.stepsize * self.stepsize)
+        rslt = np.copy(self.mass_matrix)
+        rslt /= (self.stepsize * self.stepsize)
 
-        weights = np.zeros(
-            (self.n + fixed_point_num, self.n + fixed_point_num))
-        weight_sum = np.zeros(
-            (self.n + fixed_point_num, self.n + fixed_point_num))
-        for face in self.faces:
-            verts = face.vertex_ids()
-            for k in range(3):
-                v_1 = verts[k]
-                v_2 = verts[(k + 1) % 3]
-                weights[v_1, v_2] += 1
-                weights[v_2, v_1] += 1
-                weight_sum[v_1, v_1] += 1
-                weight_sum[v_2, v_2] += 1
+        for potential in self.potentials:
+            points = potential.face.vertex_ids()
+            avg_inv_mass = 0.0
+            for i in range(3):
+                avg_inv_mass += self.inv_mass_matrix[points[i], points[i]]
+            avg_inv_mass /= 3.0
+            S = potential.S_matrix()
+            rslt += avg_inv_mass * S.T * potential.A.T * potential.A * S 
 
-        x = weight_sum - weights
-        for i in range(fixed_point_num):
-            con = self.fixed_points[i]
-            x[con.vert_a, -(i + 1)] = 1
-            x[-(i + 1), con.vert_a] = 1
-            M[-(i + 1), -(i + 1)] = 0
-        return x + M
+        # for constraint in self.constraints:
+        #     points = constraint.face.vertex_ids()
+        #     avg_inv_mass = 0.0
+        #     for i in range(3):
+        #         avg_inv_mass += self.inv_mass_matrix[points[i], points[i]]
+        #     avg_inv_mass /= 3.0
+        #     S = constraint.S_matrix()
+        #     rslt += avg_inv_mass * S.T * constraint.A.T * constraint.A * S 
+
+        return rslt        
