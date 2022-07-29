@@ -79,21 +79,18 @@ class PDModel:
             q_0 = np.copy(q_1)
             '''Local solve'''
             # Triangle potential
-            for face in self.faces:
-                f_verts = face.vertex_ids()
+            for potential in self.potentials:
+                points = potential.face.vertex_ids()
+                avg_mass = 0.0
                 for i in range(3):
-                    v1 = f_verts[i]
-                    v2 = f_verts[(i + 1) % 3]
-                    T = self.potential_for_triangle(face, q_1, v2)
-                    edge = self.verts[v2] - self.verts[v1]
-                    g = T.dot(edge)
-                    b[v1] = b[v1] - g
-                    b[v2] = b[v2] + g
+                    avg_mass += self.mass_matrix[3 * points[i], 3 * points[i]]
+                avg_mass /= 3.0
+                potential.calculateRHS(self, self.rendering_verts, b, avg_mass)
 
             # Constraints
-            for con_i in range(len(self.fixed_points)):
-                con = self.fixed_points[con_i]
-                b[-(con_i + 1)] = self.verts[con.vert_a]
+            # for con_i in range(len(self.fixed_points)):
+            #     con = self.fixed_points[con_i]
+            #     b[-(con_i + 1)] = self.verts[con.vert_a]
 
             '''Global solve'''
             q_1 = np.linalg.solve(self.global_matrix, b.flatten())
@@ -117,7 +114,7 @@ class PDModel:
             points = potential.face.vertex_ids()
             avg_inv_mass = 0.0
             for i in range(3):
-                avg_inv_mass += self.inv_mass_matrix[points[i], points[i]]
+                avg_inv_mass += self.inv_mass_matrix[3 * points[i], 3 * points[i]]
             avg_inv_mass /= 3.0
             S = potential.S_matrix()
             rslt += avg_inv_mass * S.T @ potential.A.T @ potential.A @ S 
