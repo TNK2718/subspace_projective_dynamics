@@ -34,7 +34,7 @@ rollout_name = '1'
 root_dir = pathlib.Path(__file__).parent.resolve()
 output_dir = os.path.join(root_dir, 'output', dataset_name)
 rollout_dir = os.path.join(output_dir, 'rollout')
-rollout_path = os.path.join(rollout_dir, 'rollout.pkl')
+# rollout_path = os.path.join(rollout_dir, 'fullspace_rollout.pkl')
 data_dir = os.path.join(root_dir, 'data', dataset_name)
 
 #
@@ -43,9 +43,6 @@ pca_base_path = os.path.join(data_dir, 'pca_base.pkl')
 
 
 def main(unused_argv):
-    print("Ploting run", rollout_path)
-    with open(rollout_path, 'rb') as fp:
-        rollout_data = pickle.load(fp)
     fig = plt.figure(figsize=(19.2, 10.8))
     ax = fig.add_subplot(111, projection='3d')
     skip = 10
@@ -62,7 +59,6 @@ def main(unused_argv):
     len_h = 0.3
     models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
 
-
     def animate(num):
         step = (num * skip) % num_steps
 
@@ -75,20 +71,23 @@ def main(unused_argv):
         for model in models:
             vert = model.rendering_verts
             faces = model.faces
-            ax.plot_trisurf(vert[:, 0], vert[:, 1], faces, vert[:, 2], shade=True)
+            ax.plot_trisurf(vert[:, 0], vert[:, 1],
+                            faces, vert[:, 2], shade=True)
 
         ax.set_title('Step %d' % (step))
 
+        # advance time
         for model in models:
             model.simulate()
+
         return fig,
 
     # ani = animation.FuncAnimation(fig, animate, frames=math.floor(num_frames * 0.1), interval=100)
     # ani = animation.FuncAnimation(fig, animate, interval=100)
-    ani = animation.FuncAnimation(fig, animate, frames=num_frames * 100, interval=50)
+    ani = animation.FuncAnimation(
+        fig, animate, frames=num_frames * 100, interval=50)
 
-    ani.save(os.path.join(latest_subdir, '1', 'rollout',
-             'trajectory.mp4'), writer="ffmpeg")
+    ani.save(os.path.join(rollout_dir, 'fullspace_traj.mp4'), writer="ffmpeg")
     plt.show(block=True)
 
 
