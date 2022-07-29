@@ -1,6 +1,3 @@
-# TODO
-'''https://github.com/TanaTanoi/lets-get-physical-simluation'''
-
 import math
 import numpy as np
 
@@ -47,7 +44,7 @@ class ARAPpotential(Potential):
         ds = np.matrix((v3 - v1, v2 - v1, (0, 0, 0))).T
         combined = ds.dot(self.dm_I)
         projection = self.clamped_svd_for_matrix(combined).flatten()
-        projection = self.A.T * projection / mass
+        projection = self.A.T.dot(projection) / mass
         for i in range(9):
             b[3 * points[i / 3] + i % 3] += projection[i]
 

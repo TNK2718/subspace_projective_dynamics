@@ -7,9 +7,6 @@ import math
 
 np.set_printoptions(linewidth=2000)
 
-'''https://github.com/TanaTanoi/lets-get-physical-simluation'''
-
-
 class PDModel:
     def __init__(self, verts, faces, uvs=[], constraints=[], dyn_forces=[]):
         '''Geometry'''
@@ -67,16 +64,15 @@ class PDModel:
             f.add_force()
 
         '''Inertia'''
-        accel = (self.stepsize * self.stepsize) * \
-            linalg.inv(self.mass_matrix).dot(forces)
+        accel = (self.stepsize * self.stepsize) * self.inv_mass_matrix.dot(forces)
         inertia = self.velocities * self.stepsize
         s_0 = self.position + inertia + accel
 
         '''Local global loop'''
         q_1 = np.copy(s_0)
-        b_array = np.zeros((self.n + len(self.fixed_points), 3))
+        b = np.zeros((3 * self.n))
         M = self.mass_matrix / (self.stepsize * self.stepsize)
-        b_array[:self.n] = M.dot(s_0)
+        b[:self.n] = M.dot(s_0)
         flag = False
 
         for _ in range(self.max_iter):
@@ -91,16 +87,16 @@ class PDModel:
                     T = self.potential_for_triangle(face, q_1, v2)
                     edge = self.verts[v2] - self.verts[v1]
                     g = T.dot(edge)
-                    b_array[v1] = b_array[v1] - g
-                    b_array[v2] = b_array[v2] + g
+                    b[v1] = b[v1] - g
+                    b[v2] = b[v2] + g
 
             # Constraints
             for con_i in range(len(self.fixed_points)):
                 con = self.fixed_points[con_i]
-                b_array[-(con_i + 1)] = self.verts[con.vert_a]
+                b[-(con_i + 1)] = self.verts[con.vert_a]
 
             '''Global solve'''
-            q_1 = np.linalg.solve(self.global_matrix, b_array.flatten())
+            q_1 = np.linalg.solve(self.global_matrix, b.flatten())
             # Don't grab the unwanted fixed points
             q_1 = q_1[:-3 * len(self.fixed_points)]
 
@@ -124,7 +120,7 @@ class PDModel:
                 avg_inv_mass += self.inv_mass_matrix[points[i], points[i]]
             avg_inv_mass /= 3.0
             S = potential.S_matrix()
-            rslt += avg_inv_mass * S.T * potential.A.T * potential.A * S 
+            rslt += avg_inv_mass * S.T @ potential.A.T @ potential.A @ S 
 
         # for constraint in self.constraints:
         #     points = constraint.face.vertex_ids()
