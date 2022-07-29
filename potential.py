@@ -59,7 +59,7 @@ class ARAPpotential(Potential):
         return rslt
     
     def S_matrix(self):
-        rslt = np.zeros(9, 3 * self.number_of_verts)
+        rslt = np.zeros((9, 3 * self.number_of_verts))
         points = self.face.vertex_ids()
         for i in range(9):
             rslt[i, 3 * points[i / 3] + i % 3] = 1.0

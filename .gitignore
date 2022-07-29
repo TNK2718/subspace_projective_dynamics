@@ -16,3 +16,4 @@ output/
 *.out
 *.png
 *.ckpt
+__pycache__
