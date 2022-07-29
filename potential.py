@@ -21,7 +21,7 @@ class Potential:
 
 class ARAPpotential(Potential):
     def __init__(self, number_of_verts, verts, face, weight, s_max, s_min):
-        super().__init__(number_of_verts, face, weight)
+        super().__init__(number_of_verts, verts, face, weight)
         self.s_max = s_max
         self.s_min = s_min
 
