@@ -43,6 +43,8 @@ pca_base_path = os.path.join(data_dir, 'pca_base.pkl')
 
 
 def main(unused_argv):
+    print('fullspace rollout starting...')
+
     fig = plt.figure(figsize=(19.2, 10.8))
     ax = fig.add_subplot(111, projection='3d')
     skip = 10
@@ -75,6 +77,7 @@ def main(unused_argv):
                             faces, vert[:, 2], shade=True)
 
         ax.set_title('Step %d' % (step))
+        print('Step: %d' % (step))
 
         # advance time
         for model in models:
