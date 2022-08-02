@@ -105,8 +105,8 @@ class PDModel:
             if diff < self.eps_n:
                 break
 
+        self.velocities = ((q_1 - self.position)) / self.stepsize
         self.position = np.copy(q_1)
-        self.velocities = ((q_1 - self.rendering_verts)) / self.stepsize
         self.rendering_verts = q_1.reshape((self.n, 3))
 
     def calculate_global_matrix(self):
