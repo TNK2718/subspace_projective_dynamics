@@ -77,7 +77,7 @@ class PDModel:
         q_1 = np.copy(s_0)
         b = np.zeros((3 * self.n))
         M = self.mass_matrix / (self.stepsize * self.stepsize)
-        b[:self.n] = M.dot(s_0)
+        b[:3*self.n] = M.dot(s_0)
         flag = False
 
         for _ in range(self.max_iter):
