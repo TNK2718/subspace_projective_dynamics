@@ -72,7 +72,7 @@ def main(unused_argv):
 
         for model in models:
             vert = model.rendering_verts
-            faces = model.faces
+            faces = model.rendering_faces
             ax.plot_trisurf(vert[:, 0], vert[:, 1],
                             faces, vert[:, 2], shade=True)
 

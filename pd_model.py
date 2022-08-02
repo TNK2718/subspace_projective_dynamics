@@ -15,6 +15,11 @@ class PDModel:
         self.verts = verts
         self.rendering_verts = np.copy(verts)
         self.faces = faces
+        self.rendering_faces = np.zeros((self.faces.shape[0], 3), dtype = int)
+        for i in range(self.faces.shape[0]):
+            self.rendering_faces[i, 0] = self.faces.v1
+            self.rendering_faces[i, 1] = self.faces.v2
+            self.rendering_faces[i, 2] = self.faces.v3
         self.verts_to_tri = []
         for i in range(self.n):
             in_faces = []
