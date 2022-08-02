@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import numpy.linalg as linalg
 import face
@@ -110,6 +111,7 @@ class PDModel:
         rslt /= (self.stepsize * self.stepsize)
 
         for potential in self.potentials:
+            print(time.time())
             points = potential.face.vertex_ids()
             avg_inv_mass = 0.0
             for i in range(3):
