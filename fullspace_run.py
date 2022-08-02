@@ -75,6 +75,7 @@ def main(unused_argv):
             faces = model.rendering_faces
             ax.plot_trisurf(vert[:, 0], vert[:, 1],
                             faces, vert[:, 2], shade=True)
+            print(vert[0,:])
 
         ax.set_title('Step %d' % (step))
         print('Step: %d' % (step))
