@@ -99,8 +99,6 @@ class PDModel:
 
             '''Global solve'''
             q_1 = np.linalg.solve(self.global_matrix, b.flatten())
-            # Don't grab the unwanted fixed points
-            q_1 = q_1[:-3 * len(self.fixed_points)]
 
             # break
             diff = np.linalg.norm((q_1 - q_0), ord=2)
