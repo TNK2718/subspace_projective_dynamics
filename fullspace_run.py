@@ -23,6 +23,7 @@ from absl import app
 from absl import flags
 from matplotlib import animation
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import math
 import pd_model
 import geometry_init
