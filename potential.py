@@ -46,7 +46,7 @@ class ARAPpotential(Potential):
         projection = self.clamped_svd_for_matrix(combined).flatten()
         projection = self.A.T.dot(projection) / mass
         for i in range(9):
-            b[3 * points[i / 3] + i % 3] += projection[i]
+            b[3 * points[i // 3] + i % 3] += projection[i]
 
 
     def A_matrix(self):
@@ -62,7 +62,7 @@ class ARAPpotential(Potential):
         rslt = np.zeros((9, 3 * self.number_of_verts))
         points = self.face.vertex_ids()
         for i in range(9):
-            rslt[i, 3 * points[i / 3] + i % 3] = 1.0
+            rslt[i, 3 * points[i // 3] + i % 3] = 1.0
         return rslt
 
     def clamped_svd_for_matrix(self, matrix):
