@@ -90,7 +90,7 @@ class PDModel:
                 for i in range(3):
                     avg_mass += self.mass_matrix[3 * points[i], 3 * points[i]]
                 avg_mass /= 3.0
-                potential.calculateRHS(self, self.rendering_verts, b, avg_mass)
+                potential.calculateRHS(self.rendering_verts, b, avg_mass)
 
             # Constraints
             # for con_i in range(len(self.fixed_points)):
