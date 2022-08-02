@@ -52,7 +52,7 @@ class PDModel:
         self.mass_matrix = np.identity(3 * self.n)  # TODO
         self.mass_matrix /= (len(self.faces))
         self.inv_mass_matrix = np.identity(3 * self.n) # TODO
-        self.global_matrix = self.calculate_triangle_global_matrix()
+        self.global_matrix = self.calculate_global_matrix()
         self.dyn_forces = dyn_forces  # Dynamics external forces
         # Static external forces
         self.stat_forces = np.zeros(((3 * self.n)))
@@ -111,19 +111,20 @@ class PDModel:
         self.velocities = ((q_1 - self.rendering_verts)) / self.stepsize
         self.rendering_verts = q_1.reshape((self.n, 3))
 
-    def calculate_triangle_global_matrix(self):
+    def calculate_global_matrix(self):
         rslt = np.copy(self.mass_matrix)
         rslt /= (self.stepsize * self.stepsize)
 
         for potential in self.potentials:
-            print(time.time())
-            points = potential.face.vertex_ids()
-            avg_inv_mass = 0.0
-            for i in range(3):
-                avg_inv_mass += self.inv_mass_matrix[3 * points[i], 3 * points[i]]
-            avg_inv_mass /= 3.0
-            S = potential.S_matrix()
-            rslt += avg_inv_mass * S.T @ potential.A.T @ potential.A @ S 
+            # print(time.time())
+            # points = potential.face.vertex_ids()
+            # avg_inv_mass = 0.0
+            # for i in range(3):
+            #     avg_inv_mass += self.inv_mass_matrix[3 * points[i], 3 * points[i]]
+            # avg_inv_mass /= 3.0
+            # S = potential.S_matrix()
+            # rslt += avg_inv_mass * S.T @ potential.A.T @ potential.A @ S 
+            potential.calculate_triangle_global_matrix(rslt)
 
         # for constraint in self.constraints:
         #     points = constraint.face.vertex_ids()
