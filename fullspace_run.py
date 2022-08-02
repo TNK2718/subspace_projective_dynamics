@@ -91,7 +91,7 @@ def main(unused_argv):
     # ani = animation.FuncAnimation(
     #     fig, animate, frames=num_frames * 100, interval=50)
     ani = animation.FuncAnimation(
-        fig, animate, frames=num_frames, interval=50)
+        fig, animate, frames=num_frames * 100, interval=50)
 
     ani.save(os.path.join(rollout_dir, 'fullspace_traj.mp4'), writer="ffmpeg")
     plt.show(block=True)
