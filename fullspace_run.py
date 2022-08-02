@@ -48,7 +48,7 @@ def main(unused_argv):
     fig = plt.figure(figsize=(19.2, 10.8))
     ax = fig.add_subplot(111, projection='3d')
     skip = 10
-    num_steps = 100
+    num_steps = 500
     num_frames = num_steps
 
     # Setup solvers
