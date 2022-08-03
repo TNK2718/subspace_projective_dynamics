@@ -9,6 +9,7 @@ import math
 
 np.set_printoptions(linewidth=2000)
 
+
 class PDModel:
     def __init__(self, verts, faces, uvs=[], constraints=[], dyn_forces=[], fixed_points=[]):
         '''Geometry'''
@@ -16,7 +17,7 @@ class PDModel:
         self.verts = verts
         self.rendering_verts = np.copy(verts)
         self.faces = faces
-        self.rendering_faces = np.zeros((len(self.faces), 3), dtype = int)
+        self.rendering_faces = np.zeros((len(self.faces), 3), dtype=int)
         for i in range(len(self.faces)):
             self.rendering_faces[i, 0] = self.faces[i].v1
             self.rendering_faces[i, 1] = self.faces[i].v2
@@ -34,7 +35,7 @@ class PDModel:
         '''Solver option'''
         self.stepsize = 0.3
         self.drag = 1.00
-        self.max_iter = 1
+        self.max_iter = 5
         self.eps_n = 0.01  # epsilon for local-global loop(nonlinear solver)
 
         '''Constraints'''
@@ -54,7 +55,7 @@ class PDModel:
         self.velocities = np.zeros((3 * self.n))
         self.mass_matrix = np.identity(3 * self.n)  # TODO
         self.mass_matrix /= (len(self.faces))
-        self.inv_mass_matrix = np.identity(3 * self.n) # TODO
+        self.inv_mass_matrix = np.identity(3 * self.n)  # TODO
         self.global_matrix = self.calculate_global_matrix()
         self.inv_global_matrix = np.linalg.inv(self.global_matrix)
 
@@ -62,7 +63,7 @@ class PDModel:
         # Static external forces
         self.stat_forces = np.zeros(((3 * self.n)))
         gravity = np.zeros(((self.n, 3)))  # gravity
-        gravity[:, 2] = -9.8 * self.mass_matrix[0, 0] # TODO
+        gravity[:, 2] = -9.8 * self.mass_matrix[0, 0]  # TODO
         self.stat_forces += gravity.flatten()
 
         # self.wind_magnitude = 5
@@ -74,7 +75,8 @@ class PDModel:
             f.add_force()
 
         '''Inertia'''
-        accel = (self.stepsize * self.stepsize) * self.inv_mass_matrix.dot(forces)
+        accel = (self.stepsize * self.stepsize) * \
+            self.inv_mass_matrix.dot(forces)
         inertia = self.velocities * self.stepsize
         s_0 = self.position + inertia + accel
 
@@ -85,7 +87,7 @@ class PDModel:
         b_0 = M.dot(s_0)
         b = np.copy(b_0)
 
-        for _ in range(self.max_iter):
+        for iter in range(self.max_iter):
             q_0 = np.copy(q_1)
             b = b_0
 
@@ -105,8 +107,9 @@ class PDModel:
                 con.calculateRHS(self.rendering_verts, b, 1.0)
 
             '''Global solve'''
-            q_1 = np.linalg.solve(self.global_matrix, b.flatten())
-            # q_1 = self.inv_global_matrix.dot(b.flatten())
+            # q_1 = np.linalg.solve(self.global_matrix, b.flatten())
+            q_1 = self.inv_global_matrix.dot(b.flatten())
+
             for point in self.fixed_points:
                 for i in range(3):
                     q_1[3 * point + i] = self.ini_position[3 * point + i]
@@ -134,7 +137,7 @@ class PDModel:
             #     avg_inv_mass += self.inv_mass_matrix[3 * points[i], 3 * points[i]]
             # avg_inv_mass /= 3.0
             # S = potential.S_matrix()
-            # rslt += avg_inv_mass * S.T @ potential.A.T @ potential.A @ S 
+            # rslt += avg_inv_mass * S.T @ potential.A.T @ potential.A @ S
             potential.calculate_triangle_global_matrix(rslt)
 
         for constraint in self.constraints:
@@ -146,6 +149,6 @@ class PDModel:
         #         avg_inv_mass += self.inv_mass_matrix[points[i], points[i]]
         #     avg_inv_mass /= 3.0
         #     S = constraint.S_matrix()
-        #     rslt += avg_inv_mass * S.T * constraint.A.T * constraint.A * S 
+        #     rslt += avg_inv_mass * S.T * constraint.A.T * constraint.A * S
 
-        return rslt        
+        return rslt
