@@ -98,6 +98,10 @@ def prepare_files_and_directories():
 #         plt.show(block=True)
 
 def main(unused_argv):
+    #
+    prepare_files_and_directories()
+    
+    #
     print('fullspace rollout starting...')
 
     fig = plt.figure(figsize=(19.2, 10.8))
