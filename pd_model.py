@@ -135,6 +135,8 @@ class PDModel:
             # rslt += avg_inv_mass * S.T @ potential.A.T @ potential.A @ S 
             potential.calculate_triangle_global_matrix(rslt)
 
+        for constraint in self.constraints:
+            constraint.calculate_constraint_global_matrix(rslt)
         # for constraint in self.constraints:
         #     points = constraint.face.vertex_ids()
         #     avg_inv_mass = 0.0
