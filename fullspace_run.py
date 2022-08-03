@@ -89,7 +89,8 @@ def main(unused_argv):
 
         ax.set_title('Step %d' % (step))
         print('Step: %d' % (step))
-        print(time.time())
+        # print(time.time())
+        print(models[0].rendering_verts[0,:])
 
         # advance time
         for _ in range(skip):
