@@ -15,9 +15,6 @@ class Potential:
     def A_matrix(self):
         raise Exception
 
-    # def S_matrix(self):
-    #     raise Exception
-
     def calculate_triangle_global_matrix(self, mat):
         raise Exception
 
@@ -64,13 +61,6 @@ class ARAPpotential(Potential):
                     math.sqrt(abs(self.area))
         return rslt
 
-    # def S_matrix(self):
-    #     rslt = np.zeros((9, 3 * self.number_of_verts))
-    #     points = self.face.vertex_ids()
-    #     for i in range(9):
-    #         rslt[i, 3 * points[i // 3] + i % 3] = 1.0
-    #     return rslt
-
     def calculate_triangle_global_matrix(self, mat):
         A_T_A = self.A.T * self.A
         points = self.face.vertex_ids()
@@ -81,6 +71,6 @@ class ARAPpotential(Potential):
 
     def clamped_svd_for_matrix(self, matrix):
         u, s, v_t = np.linalg.svd(matrix)
-        s = np.diag(np.clip(s, 0, 1.0))
+        s = np.diag(np.clip(s, self.s_min, self.s_max))
         # return np.around(u.dot(s).dot(v_t), 11)
         return u.dot(s).dot(v_t)

@@ -1,69 +1,40 @@
-# TODO
-'''https://github.com/TanaTanoi/lets-get-physical-simluation'''
-
+import math
 import numpy as np
 
+
 class Constraint:
-    def __init__(self, number_of_verts, vert_a, vert_b=False, rest_length=False, fixed_point=False):
-        self.vert_a = vert_a
-        self.vert_b = vert_b
-        self.rest_length = rest_length
-        self.fixed_point = fixed_point
-        self.A = Constraint.A_matrix(self.type())
-        self.S = Constraint.S_matrix(self.type(), number_of_verts, vert_a, vert_b=vert_b)
+    def __init__(self, number_of_verts, verts, v_ids, weight):
+        self.number_of_verts = number_of_verts
+        self.v_ids = v_ids
+        self.weight = weight
 
-    def type(self):
-        if self.vert_a is not False and self.vert_b is not False:
-            return "SPRING"
-        else:
-            return "FIXED"
+    def calculateRHS(self, verts, b, mass):
+        raise Exception
 
-    def A_matrix(constraint_type):
-        if constraint_type == "SPRING":
-            # A = np.matrix(
-            #     [[0.5,0,0,-0.5,0,0],
-            #     [0,0.5,0,0,-0.5,0],
-            #     [0,0,0.5,0,0,-0.5],
-            #     [-0.5,0,0,0.5,0,0],
-            #     [0,-0.5,0,0,0.5,0],
-            #     [0,0,-0.5,0,0,0.5]]
-            # )
-            A = np.identity(6)
-        else:
-            A = np.identity(3)
-        return A
+    def A_matrix(self):
+        raise Exception
 
-    def calculateRHS(self, verts, b_array):
-        if self.type() == "SPRING":
-            dir_vec = verts[self.vert_a] - verts[self.vert_b]
-            dir_vec_length = np.linalg.norm(dir_vec)
-            strech_amount = dir_vec_length - self.rest_length
+    def calculate_triangle_global_matrix(self, mat):
+        raise Exception
 
-            dir_vec_normalized = dir_vec / dir_vec_length
-            update_vec = (strech_amount * 0.3) * dir_vec_normalized * -1
 
-            # v_a = verts[self.vert_a] - update_vec
-            # v_b = verts[self.vert_b] + update_vec
-            # diff = (v_a - v_b)
-            b_array[self.vert_a] += update_vec
-            b_array[self.vert_b] -= update_vec
-        else:
-            b_array[self.vert_a] += self.fixed_point
-            # print("-")
+class FixConstraint(Constraint):
+    def __init__(self, number_of_verts, verts, v_id, weight):
+        super().__init__(number_of_verts, verts, v_id, weight)
+        self.A = self.A_matrix()
+        self.ini_pos = verts[v_id, :]
 
-    def S_matrix(constraint_type, n, vert_a, vert_b=False):
-        if constraint_type  == "SPRING":
-            S = np.zeros((6, n * 3))
-            S[0, vert_a * 3] = 1
-            S[1, vert_a * 3 + 1] = 1
-            S[2, vert_a * 3 + 2] = 1
+    def calculateRHS(self, verts, b, mass):
+        projection = self.ini_pos * self.weight  # I^TIp = p
+        for i in range(3):
+            b[3 * self.v_ids + i] += projection[i]
 
-            S[3, vert_b * 3] = 1
-            S[4, vert_b * 3 + 1] = 1
-            S[5, vert_b * 3 + 2] = 1
-        else:
-            S = np.zeros((3, n * 3))
-            S[0, vert_a * 3] = 1
-            S[1, vert_a * 3 + 1] = 1
-            S[2, vert_a * 3 + 2] = 1
-        return S
+    def A_matrix(self):
+        return np.identity(3)
+
+    def calculate_triangle_global_matrix(self, mat):
+        A_T_A = self.A
+        for i in range(3):
+            for j in range(3):
+                mat[3 * self.v_ids + i % 3, 3 * self.v_ids + j %
+                    3] += A_T_A[i, j] * self.weight
