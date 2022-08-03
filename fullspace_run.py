@@ -49,54 +49,6 @@ def prepare_files_and_directories():
     Path(rollout_dir).mkdir(parents=True, exist_ok=True)
     Path(data_dir).mkdir(parents=True, exist_ok=True)
 
-
-# def main(unused_argv):
-#     print('fullspace rollout starting...')
-
-#     fig = plt.figure(figsize=(19.2, 10.8))
-#     ax = fig.add_subplot(111, projection='3d')
-#     skip = 1
-#     num_steps = 500
-#     num_frames = num_steps
-#     num = 0
-
-#     # Setup solvers
-#     models = []
-
-#     # flag
-#     res_w = 50
-#     res_h = 30
-#     len_w = 0.5
-#     len_h = 0.3
-#     models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
-
-#     for _ in range(num_steps):
-#         step = (num * skip)
-#         num += 1
-
-#         ax.cla()
-
-#         ax.set_xlim([-1.0, 1.0])
-#         ax.set_ylim([-1.0, 1.0])
-#         ax.set_zlim([-1.0, 1.0])
-
-#         for model in models:
-#             vert = model.rendering_verts
-#             faces = model.rendering_faces
-#             ax.plot_trisurf(vert[:, 0], vert[:, 1],
-#                             faces, vert[:, 2], shade=True)
-
-#         ax.set_title('Step %d' % (step))
-#         print('Step: %d' % (step))
-
-#         # advance time
-#         for model in models:
-#             model.simulate()
-        
-#         fig_name = 'fullspace_traj' + str(step) + '.jpg'
-#         plt.savefig(os.path.join(rollout_dir, fig_name))
-#         plt.show(block=True)
-
 def main(unused_argv):
     #
     prepare_files_and_directories()
@@ -116,8 +68,8 @@ def main(unused_argv):
     # flag
     res_w = 50
     res_h = 30
-    len_w = 0.5
-    len_h = 0.3
+    len_w = 1.0
+    len_h = 0.6
     models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
 
     def animate(num):
@@ -126,7 +78,7 @@ def main(unused_argv):
         ax.cla()
 
         ax.set_xlim([-1.0, 1.0])
-        ax.set_ylim([-2.0, 1.0])
+        ax.set_ylim([-1.0, 1.0])
         ax.set_zlim([-1.0, 1.0])
 
         for model in models:
