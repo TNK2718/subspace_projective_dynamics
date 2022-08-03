@@ -27,7 +27,7 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     for x in range(width):
         for y in range(height):
             verts[x + (y * width)] = np.array((x * width_gap -
-                                               MAX_WIDTH_SIZE / 2, y * height_gap - MAX_HEIGHT_SIZE / 2, 0))
+                                               MAX_WIDTH_SIZE / 2, y * height_gap + MAX_HEIGHT_SIZE / 2, 0))
             uvs[x + (y * width)] = np.array(((x % width) /
                                              width, 1 - (y % height) / height))
 
@@ -49,10 +49,10 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
             add_face(v_1, v_2, v_3, faces)
 
     # fix top and bottom left corners
-    # add_fix_constraint(n, verts, 0, fix_weight, constraints)
+    add_fix_constraint(n, verts, 0, fix_weight, constraints)
     bottom_left = width * (height - 1)
-    # add_fix_constraint(
-    #     n, verts, bottom_left, fix_weight, constraints)
+    add_fix_constraint(
+        n, verts, bottom_left, fix_weight, constraints)
 
     fixed_points.append(0)
     fixed_points.append(bottom_left)
