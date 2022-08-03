@@ -1,4 +1,5 @@
 import time
+from matplotlib.cbook import flatten
 import numpy as np
 import numpy.linalg as linalg
 import face
@@ -32,8 +33,8 @@ class PDModel:
         '''Solver option'''
         self.stepsize = 0.3
         self.drag = 1.00
-        self.max_iter = 30
-        self.eps_n = 0.001  # epsilon for local-global loop(nonlinear solver)
+        self.max_iter = 10
+        self.eps_n = 0.01  # epsilon for local-global loop(nonlinear solver)
 
         '''Constraints'''
         # Inner Potential
@@ -53,6 +54,8 @@ class PDModel:
         self.mass_matrix /= (len(self.faces))
         self.inv_mass_matrix = np.identity(3 * self.n) # TODO
         self.global_matrix = self.calculate_global_matrix()
+        self.inv_global_matrix = np.linalg.inv(self.global_matrix)
+
         self.dyn_forces = dyn_forces  # Dynamics external forces
         # Static external forces
         self.stat_forces = np.zeros(((3 * self.n)))
@@ -98,7 +101,9 @@ class PDModel:
                 con.calculateRHS(self.rendering_verts, b, 1.0)
 
             '''Global solve'''
-            q_1 = np.linalg.solve(self.global_matrix, b.flatten())
+            # q_1 = np.linalg.solve(self.global_matrix, b.flatten())
+            q_1 = self.inv_global_matrix.dot(b.flatten())
+            self.rendering_verts = q_1.reshape((self.n, 3))
 
             # break
             diff = np.linalg.norm((q_1 - q_0), ord=2)

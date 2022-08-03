@@ -17,7 +17,7 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     n = width * height
     width_gap = MAX_WIDTH_SIZE / width
     height_gap = -MAX_HEIGHT_SIZE / height
-    fix_weight = 100
+    fix_weight = 1.0
 
     verts = np.zeros((n, 3))
     faces = []

@@ -35,6 +35,4 @@ class FixConstraint(Constraint):
     def calculate_triangle_global_matrix(self, mat):
         A_T_A = self.A
         for i in range(3):
-            for j in range(3):
-                mat[3 * self.v_ids + i % 3, 3 * self.v_ids + j %
-                    3] += A_T_A[i, j] * self.weight
+            mat[3 * self.v_ids + i, 3 * self.v_ids + i] += 1.0 * self.weight
