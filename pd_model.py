@@ -62,7 +62,7 @@ class PDModel:
         # Static external forces
         self.stat_forces = np.zeros(((3 * self.n)))
         gravity = np.zeros(((self.n, 3)))  # gravity
-        gravity[:, 2] = -9.8
+        gravity[:, 2] = -9.8 * self.mass_matrix[0, 0] # TODO
         self.stat_forces += gravity.flatten()
 
         # self.wind_magnitude = 5
