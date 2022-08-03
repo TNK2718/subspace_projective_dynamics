@@ -20,6 +20,7 @@ import os
 import pickle
 import pathlib
 from pathlib import Path
+from tracemalloc import start
 from absl import app
 from absl import flags
 from matplotlib import animation
@@ -71,6 +72,7 @@ def main(unused_argv):
     len_w = 1.5
     len_h = 0.9
     models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
+    start = time.time()
 
     def animate(num):
         step = (num * skip) % num_steps
@@ -89,7 +91,7 @@ def main(unused_argv):
 
         ax.set_title('Step %d' % (step))
         print('Step: %d' % (step))
-        # print(time.time())
+        print(time.time() - start)
         print(models[0].rendering_verts[0,:])
 
         # advance time
