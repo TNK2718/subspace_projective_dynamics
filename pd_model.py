@@ -82,11 +82,13 @@ class PDModel:
         q_1 = np.copy(s_0)
         b = np.zeros((3 * self.n))
         M = self.mass_matrix / (self.stepsize * self.stepsize)
-        b[:3*self.n] = M.dot(s_0)
-        flag = False
+        b_0 = M.dot(s_0)
+        b = np.copy(b_0)
 
         for _ in range(self.max_iter):
             q_0 = np.copy(q_1)
+            b = b_0
+
             '''Local solve'''
             # Triangle potential
             for potential in self.potentials:
