@@ -106,7 +106,7 @@ def main(unused_argv):
 
     fig = plt.figure(figsize=(19.2, 10.8))
     ax = fig.add_subplot(111, projection='3d')
-    skip = 10
+    skip = 1
     num_steps = 500
     num_frames = num_steps
 
@@ -151,7 +151,7 @@ def main(unused_argv):
     # ani = animation.FuncAnimation(
     #     fig, animate, frames=num_frames * 100, interval=50)
     ani = animation.FuncAnimation(
-        fig, animate, frames=num_frames, interval=50)
+        fig, animate, frames=num_frames)
 
     ani.save(os.path.join(rollout_dir, 'fullspace_traj.mp4'), writer="ffmpeg")
     plt.show(block=True)
