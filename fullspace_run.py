@@ -59,7 +59,7 @@ def main(unused_argv):
     fig = plt.figure(figsize=(19.2, 10.8))
     ax = fig.add_subplot(111, projection='3d')
     skip = 1
-    num_steps = 50
+    num_steps = 10
     num_frames = num_steps
 
     # Setup solvers
@@ -78,7 +78,7 @@ def main(unused_argv):
         ax.cla()
 
         ax.set_xlim([-1.0, 1.0])
-        ax.set_ylim([-1.0, 1.0])
+        ax.set_ylim([-10.0, 10.0])
         ax.set_zlim([-1.0, 1.0])
 
         for model in models:
