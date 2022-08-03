@@ -26,6 +26,7 @@ from absl import flags
 from matplotlib import animation
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
 import math
 import pd_model
 import geometry_init
@@ -60,7 +61,7 @@ def main(unused_argv):
     fig = plt.figure(figsize=(19.2, 10.8))
     ax = fig.add_subplot(111, projection='3d')
     skip = 1
-    num_steps = 10
+    num_steps = 500
     num_frames = num_steps
 
     # Setup solvers
@@ -73,6 +74,9 @@ def main(unused_argv):
     len_h = 0.9
     models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
     start = time.time()
+
+    # Trajectory of a cloth
+    fullspace_traj = np.zeros((num_frames, models[0].n))
 
     def animate(num):
         step = (num * skip) % num_steps
