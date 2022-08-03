@@ -32,12 +32,6 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
                                              width, 1 - (y % height) / height))
 
     for v_id in range(n):
-        # if its a thing on the end
-        if v_id % width == width - 1:
-            # if v_id < n - 1:
-            #     add_spring_constraint(
-            #         verts, v_id, v_id + width, constraints)
-            continue
         # points before the bottom line
         if v_id % width < width - 1 and v_id < n - width:
             v_1 = v_id
