@@ -78,7 +78,7 @@ def main(unused_argv):
         ax.cla()
 
         ax.set_xlim([-1.0, 1.0])
-        ax.set_ylim([-1.0, 10.0])
+        ax.set_ylim([-1.0, 1.0])
         ax.set_zlim([-1.0, 1.0])
 
         for model in models:
