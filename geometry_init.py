@@ -30,36 +30,36 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
             uvs[x + (y * width)] = np.array(((x % width) /
                                              width, 1 - (y % height) / height))
 
-    # for v_id in range(n):
-    #     # if its a thing on the end
-    #     if v_id % width == width - 1:
-    #         if v_id < n - 1:
-    #             add_spring_constraint(
-    #                 verts, v_id, v_id + width, constraints)
-    #         continue
-    #     # points before the bottom line
-    #     if v_id < n - width:
-    #         v_1 = v_id
-    #         v_2 = v_id + width
-    #         v_3 = v_id + 1
-    #         add_face(v_1, v_2, v_3, faces)
-    #         add_spring_constraint_set(
-    #             verts, v_1, v_2, v_3, constraints)
-    #     # points after the first line
-    #     if v_id >= width:
-    #         v_1 = v_id
-    #         v_2 = v_id + 1
-    #         v_3 = v_id - (width - 1)
-    #         add_face(v_1, v_2, v_3, faces)
-    #     # the lines along the bottom
-    #     if v_id >= n - width and v_id < n:
-    #         add_spring_constraint(
-    #             verts, v_id, v_id + 1, constraints)
+    for v_id in range(n):
+        # if its a thing on the end
+        if v_id % width == width - 1:
+            # if v_id < n - 1:
+            #     add_spring_constraint(
+            #         verts, v_id, v_id + width, constraints)
+            continue
+        # points before the bottom line
+        if v_id < n - width:
+            v_1 = v_id
+            v_2 = v_id + width
+            v_3 = v_id + 1
+            add_face(v_1, v_2, v_3, faces)
+            # add_spring_constraint_set(
+            #     verts, v_1, v_2, v_3, constraints)
+        # points after the first line
+        if v_id >= width:
+            v_1 = v_id
+            v_2 = v_id + 1
+            v_3 = v_id - (width - 1)
+            add_face(v_1, v_2, v_3, faces)
+        # the lines along the bottom
+        # if v_id >= n - width and v_id < n:
+        #     # add_spring_constraint(
+        #     #     verts, v_id, v_id + 1, constraints)
 
     # fix top and bottom left corners
-    add_fixed_constraint(n, verts, 0, fix_weight, constraints)
+    add_fix_constraint(n, verts, 0, fix_weight, constraints)
     bottom_left = width * (height - 1)
-    add_fixed_constraint(
+    add_fix_constraint(
         n, verts, bottom_left, fix_weight, constraints)
     return pd_model.PDModel(verts, faces, uvs, constraints=constraints)
 
@@ -68,6 +68,6 @@ def add_face(v_1, v_2, v_3, faces):
     faces.append(face.Face(v_1, v_2, v_3))
 
 
-def add_fixed_constraint(number_of_verts, verts, v_id, weight, constraints):
+def add_fix_constraint(number_of_verts, verts, v_id, weight, constraints):
     constraints.append(constraint.FixConstraint(
         number_of_verts, verts, v_id, weight))
