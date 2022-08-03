@@ -10,7 +10,7 @@ import math
 np.set_printoptions(linewidth=2000)
 
 class PDModel:
-    def __init__(self, verts, faces, uvs=[], constraints=[], dyn_forces=[]):
+    def __init__(self, verts, faces, uvs=[], constraints=[], dyn_forces=[], fixed_points=[]):
         '''Geometry'''
         self.n = len(verts)
         self.verts = verts
@@ -29,6 +29,7 @@ class PDModel:
                     in_faces.append(face)
             self.verts_to_tri.append(in_faces)
         self.uvs = uvs
+        self.fixed_points = fixed_points
 
         '''Solver option'''
         self.stepsize = 0.3
@@ -49,6 +50,7 @@ class PDModel:
         '''Variables'''
         self.count = 0
         self.position = verts.flatten()
+        self.ini_position = np.copy(self.position)
         self.velocities = np.zeros((3 * self.n))
         self.mass_matrix = np.identity(3 * self.n)  # TODO
         self.mass_matrix /= (len(self.faces))
@@ -103,6 +105,10 @@ class PDModel:
             '''Global solve'''
             # q_1 = np.linalg.solve(self.global_matrix, b.flatten())
             q_1 = self.inv_global_matrix.dot(b.flatten())
+            for point in self.fixed_points:
+                for i in range(3):
+                    q_1[3 * point + i] = self.ini_position[3 * point + i]
+
             self.rendering_verts = q_1.reshape((self.n, 3))
 
             # break

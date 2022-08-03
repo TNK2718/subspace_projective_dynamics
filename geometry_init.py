@@ -22,6 +22,7 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     verts = np.zeros((n, 3))
     faces = []
     constraints = []
+    fixed_points = []
     uvs = np.zeros((n, 2))
     for x in range(width):
         for y in range(height):
@@ -61,6 +62,9 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     bottom_left = width * (height - 1)
     add_fix_constraint(
         n, verts, bottom_left, fix_weight, constraints)
+
+    fixed_points.append(0)
+    fixed_points.append(bottom_left)
     return pd_model.PDModel(verts, faces, uvs, constraints=constraints)
 
 
