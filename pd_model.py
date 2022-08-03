@@ -105,8 +105,8 @@ class PDModel:
                 con.calculateRHS(self.rendering_verts, b, 1.0)
 
             '''Global solve'''
-            # q_1 = np.linalg.solve(self.global_matrix, b.flatten())
-            q_1 = self.inv_global_matrix.dot(b.flatten())
+            q_1 = np.linalg.solve(self.global_matrix, b.flatten())
+            # q_1 = self.inv_global_matrix.dot(b.flatten())
             for point in self.fixed_points:
                 for i in range(3):
                     q_1[3 * point + i] = self.ini_position[3 * point + i]
