@@ -68,8 +68,8 @@ def main(unused_argv):
     # flag
     res_w = 50
     res_h = 30
-    len_w = 1.0
-    len_h = 0.6
+    len_w = 1.5
+    len_h = 0.9
     models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
 
     def animate(num):

@@ -26,8 +26,8 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     uvs = np.zeros((n, 2))
     for x in range(width):
         for y in range(height):
-            verts[x + (y * width)] = np.array((x *
-                                               width_gap, y * height_gap, 0))
+            verts[x + (y * width)] = np.array((x * width_gap -
+                                               MAX_WIDTH_SIZE / 2, y * height_gap - MAX_HEIGHT_SIZE / 2, 0))
             uvs[x + (y * width)] = np.array(((x % width) /
                                              width, 1 - (y % height) / height))
 
@@ -46,12 +46,14 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
             add_face(v_1, v_2, v_3, faces)
             # add_spring_constraint_set(
             #     verts, v_1, v_2, v_3, constraints)
-        # points after the first line
-        if v_id >= width:
-            v_1 = v_id
-            v_2 = v_id + 1
-            v_3 = v_id - (width - 1)
+
+        #
+        if v_id % width >= 1:
+            v_1 = v_id + width
+            v_2 = v_id
+            v_3 = v_id + width - 1
             add_face(v_1, v_2, v_3, faces)
+
         # the lines along the bottom
         # if v_id >= n - width and v_id < n:
         #     # add_spring_constraint(
