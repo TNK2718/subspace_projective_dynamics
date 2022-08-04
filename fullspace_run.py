@@ -95,7 +95,7 @@ def main(unused_argv):
     start = time.time()
 
     # Trajectory of a cloth
-    fullspace_traj = np.zeros((num_frames, models[0].n))
+    fullspace_traj = np.zeros((num_frames, 3 * models[0].n))
 
     def animate(num):
         step = (num * skip) % num_steps
