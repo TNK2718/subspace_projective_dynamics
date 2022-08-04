@@ -40,7 +40,7 @@ class PDModel:
 
         '''Constraints'''
         # Inner Potential
-        self.potential_weight = 1.0
+        self.potential_weight = 100.0
         self.potentials = []
         for face in self.faces:
             self.potentials.append(potential.ARAPpotential(
