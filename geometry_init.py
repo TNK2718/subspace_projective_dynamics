@@ -46,7 +46,7 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
             v_1 = v_id + width
             v_2 = v_id
             v_3 = v_id + width - 1
-            add_face(v_1, v_2, v_3, faces)
+            add_face(v_3, v_1, v_2, faces)
 
     # fix top and bottom left corners
     add_fix_constraint(n, verts, 0, fix_weight, constraints)
