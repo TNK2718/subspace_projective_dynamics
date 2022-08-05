@@ -30,6 +30,7 @@ class ARAPpotential(Potential):
         v1 = verts[points[0]]
         v2 = verts[points[1]]
         v3 = verts[points[2]]
+        
         P_m = np.zeros((3, 3))
         edge1 = v3 - v1
         edge2 = v2 - v1

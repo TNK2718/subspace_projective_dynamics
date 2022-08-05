@@ -40,7 +40,7 @@ class PDModel:
 
         '''Constraints'''
         # Inner Potential
-        self.potential_weight = 100.0
+        self.potential_weight = 100000.0
         self.potentials = []
         for face in self.faces:
             self.potentials.append(potential.ARAPpotential(
@@ -130,25 +130,9 @@ class PDModel:
         rslt /= (self.stepsize * self.stepsize)
 
         for potential in self.potentials:
-            # print(time.time())
-            # points = potential.face.vertex_ids()
-            # avg_inv_mass = 0.0
-            # for i in range(3):
-            #     avg_inv_mass += self.inv_mass_matrix[3 * points[i], 3 * points[i]]
-            # avg_inv_mass /= 3.0
-            # S = potential.S_matrix()
-            # rslt += avg_inv_mass * S.T @ potential.A.T @ potential.A @ S
             potential.calculate_triangle_global_matrix(rslt)
 
         for constraint in self.constraints:
             constraint.calculate_constraint_global_matrix(rslt)
-        # for constraint in self.constraints:
-        #     points = constraint.face.vertex_ids()
-        #     avg_inv_mass = 0.0
-        #     for i in range(3):
-        #         avg_inv_mass += self.inv_mass_matrix[points[i], points[i]]
-        #     avg_inv_mass /= 3.0
-        #     S = constraint.S_matrix()
-        #     rslt += avg_inv_mass * S.T * constraint.A.T * constraint.A * S
 
         return rslt
