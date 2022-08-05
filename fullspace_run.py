@@ -126,12 +126,6 @@ def main(unused_argv):
                 model.simulate()
         return fig,
 
-    pca_rslt = construct_base(fullspace_traj, pca_dim)
-    components = pca_rslt.components_
-    mean = np.mean(fullspace_traj, axis=0)
-
-    np.savez(os.path.join(data_dir, 'pca_base.npz'), base=components, mean=mean)
-
     # ani = animation.FuncAnimation(fig, animate, frames=math.floor(num_frames * 0.1), interval=100)
     # ani = animation.FuncAnimation(fig, animate, interval=100)
     # ani = animation.FuncAnimation(
@@ -141,6 +135,13 @@ def main(unused_argv):
 
     ani.save(os.path.join(rollout_dir, 'fullspace_traj.mp4'), writer="ffmpeg")
     plt.show(block=True)
+
+    '''Construct PCA base'''
+    pca_rslt = construct_base(fullspace_traj, pca_dim)
+    components = pca_rslt.components_
+    mean = np.mean(fullspace_traj, axis=0)
+
+    np.savez(os.path.join(data_dir, 'pca_base.npz'), base=components, mean=mean)
 
 
 if __name__ == '__main__':
