@@ -38,7 +38,7 @@ class PDModel:
         '''Solver option'''
         self.stepsize = 0.3
         self.drag = 1.00
-        self.max_iter = 10
+        self.max_iter = 5
         self.eps_n = 0.01  # epsilon for local-global loop(nonlinear solver)
 
         '''Constraints'''
