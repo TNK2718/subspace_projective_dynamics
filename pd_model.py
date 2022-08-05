@@ -31,30 +31,15 @@ class PDModel:
             self.verts_to_tri.append(in_faces)
         self.uvs = uvs
         self.fixed_points = fixed_points
+        self.mass_matrix = np.identity(3 * self.n)  # TODO
+        self.mass_matrix /= (len(self.faces))
+        self.inv_mass_matrix = np.identity(3 * self.n)  # TODO
 
         '''Solver option'''
         self.stepsize = 0.3
         self.drag = 1.00
         self.max_iter = 10
         self.eps_n = 0.01  # epsilon for local-global loop(nonlinear solver)
-
-        '''Variables'''
-        self.count = 0
-        self.position = verts.flatten()
-        self.ini_position = np.copy(self.position)
-        self.velocities = np.zeros((3 * self.n))
-        self.mass_matrix = np.identity(3 * self.n)  # TODO
-        self.mass_matrix /= (len(self.faces))
-        self.inv_mass_matrix = np.identity(3 * self.n)  # TODO
-        self.global_matrix = self.calculate_global_matrix()
-        self.inv_global_matrix = np.linalg.inv(self.global_matrix)
-
-        self.dyn_forces = dyn_forces  # Dynamics external forces
-        # Static external forces
-        self.stat_forces = np.zeros(((3 * self.n)))
-        gravity = np.zeros(((self.n, 3)))  # gravity
-        gravity[:, 2] = -9.8 * self.mass_matrix[0, 0]  # TODO
-        self.stat_forces += gravity.flatten()
 
         '''Constraints'''
         # Inner Potential
@@ -65,6 +50,23 @@ class PDModel:
                 self.n, self.verts, face, self.potential_weight, 1.0, 0.0))
         # Constraint
         self.constraints = constraints
+
+        '''Variables'''
+        self.count = 0
+        self.position = verts.flatten()
+        self.ini_position = np.copy(self.position)
+        self.velocities = np.zeros((3 * self.n))
+        self.global_matrix = self.calculate_global_matrix()
+        self.inv_global_matrix = np.linalg.inv(self.global_matrix)
+
+        self.dyn_forces = dyn_forces  # Dynamics external forces
+        # Static external forces
+        self.stat_forces = np.zeros(((3 * self.n)))
+        gravity = np.zeros(((self.n, 3)))  # gravity
+        gravity[:, 2] = -9.8 * self.mass_matrix[0, 0]  # TODO
+        self.stat_forces += gravity.flatten()
+
+        # self.wind_magnitude = 5
 
     def simulate(self):
         ''' Forces'''
