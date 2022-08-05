@@ -61,7 +61,7 @@ class ARAPpotential(Potential):
         ds = P_s.T * np.matrix((v3 - v1, v2 - v1, (0, 0, 0))).T
         combined = ds.dot(self.dm_I)
         projection = self.clamped_svd_for_matrix(combined).flatten()
-        projection = self.A.T.dot(projection.T) * self.weight
+        projection = self.A.T.dot(projection.T) * self.weight * math.sqrt(abs(self.area))
         for i in range(9):
             b[3 * points[i // 3] + i % 3] += projection[i]
 
