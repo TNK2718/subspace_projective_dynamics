@@ -33,7 +33,16 @@ fullspace_data_path = os.path.join(data_dir, 'fullspace_traj.npz')
 pca_base_path = os.path.join(data_dir, 'pca_base.npz')
 
 '''Paramters'''
-pca_dim = 500
+pca_dim = 50
+# geometry: flag
+res_w = 5
+res_h = 3
+len_w = 1.5
+len_h = 0.9
+# Animation setting
+skip = 1
+num_steps = 500
+num_frames = num_steps
 
 def prepare_files_and_directories():
     # make all the necessary directories
@@ -79,18 +88,10 @@ def main(unused_argv):
 
     fig = plt.figure(figsize=(19.2, 10.8))
     ax = fig.add_subplot(111, projection='3d')
-    skip = 1
-    num_steps = 500
-    num_frames = num_steps
 
     # Setup solvers
     models = []
 
-    # flag
-    res_w = 5
-    res_h = 3
-    len_w = 1.5
-    len_h = 0.9
     models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
     start = time.time()
 
