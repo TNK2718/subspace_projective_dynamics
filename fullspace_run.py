@@ -108,7 +108,7 @@ def main(unused_argv):
         ax.set_zlim([-1.0, 1.0])
 
         for model in models:
-            vert = model.rendering_verts
+            vert = np.copy(model.rendering_verts)
             faces = model.rendering_faces
             ax.plot_trisurf(vert[:, 0], vert[:, 1],
                             faces, vert[:, 2], shade=True)
@@ -119,7 +119,7 @@ def main(unused_argv):
         # print(models[0].rendering_verts[0,:])
 
         # save positions
-        fullspace_traj[num,:] = model.position.T
+        fullspace_traj[num,:] = np.copy(model.position.T)
 
         # advance time
         for _ in range(skip):
