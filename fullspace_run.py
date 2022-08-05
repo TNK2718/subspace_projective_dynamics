@@ -119,7 +119,7 @@ def main(unused_argv):
         # print(models[0].rendering_verts[0,:])
 
         # save positions
-        fullspace_traj[num,:] = np.copy(model.position.T)
+        fullspace_traj[num,:] = np.copy(model.position)
 
         # advance time
         for _ in range(skip):
