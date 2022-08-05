@@ -93,7 +93,7 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
 
 
 def generate_iso_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
-    n = width * height
+    n = (2 * width + 1) * height + width + 1
     width_gap = MAX_WIDTH_SIZE / width
     height_gap = -MAX_HEIGHT_SIZE / height
     fix_weight = 10000.0
