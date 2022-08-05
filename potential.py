@@ -30,7 +30,15 @@ class ARAPpotential(Potential):
         v1 = verts[points[0]]
         v2 = verts[points[1]]
         v3 = verts[points[2]]
-        dm = np.matrix((v3 - v1, v2 - v1, (0, 0, 0))).T
+        P_m = np.zeros((3, 3))
+        edge1 = v3 - v1
+        edge2 = v2 - v1
+        P_m[:, 0] = (edge1) / np.linalg.norm(edge1)
+        P_m[:, 1] = (edge2 - edge1.dot(P_m[:, 0]) * P_m[:, 0])
+        P_m[:, 1] /= np.linalg.norm(P_m[:,1])
+
+        dm = P_m.T * np.matrix((v3 - v1, v2 - v1, (0, 0, 0))).T
+        
         self.area = np.linalg.det(dm) / 2.0
         self.dm_I = np.linalg.pinv(dm)
         self.A = self.A_matrix()
@@ -41,7 +49,15 @@ class ARAPpotential(Potential):
         v1 = verts[points[0]]
         v2 = verts[points[1]]
         v3 = verts[points[2]]
-        ds = np.matrix((v3 - v1, v2 - v1, (0, 0, 0))).T
+
+        P_s = np.zeros((3, 3))
+        edge1 = v3 - v1
+        edge2 = v2 - v1
+        P_s[:, 0] = (edge1) / np.linalg.norm(edge1)
+        P_s[:, 1] = (edge2 - edge1.dot(P_s[:, 0]) * P_s[:, 0])
+        P_s[:, 1] /= np.linalg.norm(P_s[:,1])
+
+        ds = P_s.T * np.matrix((v3 - v1, v2 - v1, (0, 0, 0))).T
         combined = ds.dot(self.dm_I)
         projection = self.clamped_svd_for_matrix(combined).flatten()
         projection = self.A.T.dot(projection.T) * self.weight
