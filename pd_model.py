@@ -47,7 +47,7 @@ class PDModel:
         self.potentials = []
         for face in self.faces:
             self.potentials.append(potential.ARAPpotential(
-                self.n, self.verts, face, self.potential_weight, 1.0, 0.0))
+                self.n, self.rendering_verts, face, self.potential_weight, 1.0, 0.0))
         # Constraint
         self.constraints = constraints
 
