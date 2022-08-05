@@ -43,7 +43,7 @@ class PDModel:
 
         '''Constraints'''
         # Inner Potential
-        self.potential_weight = 1.0 * self.inv_mass_matrix[0, 0] # TODO
+        self.potential_weight = 1.0
         self.potentials = []
         for face in self.faces:
             self.potentials.append(potential.ARAPpotential(
