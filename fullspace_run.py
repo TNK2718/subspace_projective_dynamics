@@ -87,8 +87,8 @@ def main(unused_argv):
     models = []
 
     # flag
-    res_w = 50
-    res_h = 30
+    res_w = 5
+    res_h = 3
     len_w = 1.5
     len_h = 0.9
     models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
