@@ -36,7 +36,7 @@ class PDModel:
         self.inv_mass_matrix = np.identity(3 * self.n)  # TODO
 
         '''Solver option'''
-        self.stepsize = 0.3
+        self.stepsize = 0.1
         self.drag = 1.00
         self.max_iter = 10
         self.eps_n = 0.01  # epsilon for local-global loop(nonlinear solver)

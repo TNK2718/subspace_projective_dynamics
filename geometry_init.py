@@ -42,7 +42,7 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
             #     verts, v_1, v_2, v_3, constraints)
 
         #
-        if v_id % width > 0 and v_id < n - width:
+        if v_id % width > 0 and v_id < n - width + 1:
             v_1 = v_id + width
             v_2 = v_id
             v_3 = v_id + width - 1
