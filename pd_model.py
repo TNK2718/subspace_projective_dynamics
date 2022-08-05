@@ -38,16 +38,6 @@ class PDModel:
         self.max_iter = 10
         self.eps_n = 0.01  # epsilon for local-global loop(nonlinear solver)
 
-        '''Constraints'''
-        # Inner Potential
-        self.potential_weight = 1.0 * self.inv_mass_matrix[0, 0] # TODO
-        self.potentials = []
-        for face in self.faces:
-            self.potentials.append(potential.ARAPpotential(
-                self.n, self.verts, face, self.potential_weight, 1.0, 0.0))
-        # Constraint
-        self.constraints = constraints
-
         '''Variables'''
         self.count = 0
         self.position = verts.flatten()
@@ -66,7 +56,15 @@ class PDModel:
         gravity[:, 2] = -9.8 * self.mass_matrix[0, 0]  # TODO
         self.stat_forces += gravity.flatten()
 
-        # self.wind_magnitude = 5
+        '''Constraints'''
+        # Inner Potential
+        self.potential_weight = 1.0 * self.inv_mass_matrix[0, 0] # TODO
+        self.potentials = []
+        for face in self.faces:
+            self.potentials.append(potential.ARAPpotential(
+                self.n, self.verts, face, self.potential_weight, 1.0, 0.0))
+        # Constraint
+        self.constraints = constraints
 
     def simulate(self):
         ''' Forces'''
