@@ -35,7 +35,7 @@ class ARAPpotential(Potential):
         edge1 = v3 - v1
         edge2 = v2 - v1
         P_m[:, 0] = (edge1) / np.linalg.norm(edge1)
-        P_m[:, 1] = (edge2 - edge1.dot(P_m[:, 0]) * P_m[:, 0])
+        P_m[:, 1] = edge2 - edge2.dot(P_m[:, 0]) * P_m[:, 0]
         P_m[:, 1] /= np.linalg.norm(P_m[:,1])
 
         dm = P_m.T * np.matrix((v3 - v1, v2 - v1, (0, 0, 0))).T
@@ -55,7 +55,7 @@ class ARAPpotential(Potential):
         edge1 = v3 - v1
         edge2 = v2 - v1
         P_s[:, 0] = (edge1) / np.linalg.norm(edge1)
-        P_s[:, 1] = (edge2 - edge1.dot(P_s[:, 0]) * P_s[:, 0])
+        P_s[:, 1] = edge2 - edge2.dot(P_s[:, 0]) * P_s[:, 0]
         P_s[:, 1] /= np.linalg.norm(P_s[:,1])
 
         ds = P_s.T * np.matrix((v3 - v1, v2 - v1, (0, 0, 0))).T
