@@ -92,7 +92,8 @@ def main(unused_argv):
     # Setup solvers
     models = []
 
-    models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
+    # models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
+    models.append(geometry_init.generate_iso_plane(res_w, res_h, len_w, len_h))
     start = time.time()
 
     # Trajectory of a cloth

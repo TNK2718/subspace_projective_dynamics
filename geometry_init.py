@@ -31,7 +31,7 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
             uvs[x + (y * width)] = np.array(((x % width) /
                                              width, 1 - (y % height) / height))
 
-    for v_id in range(n):
+    # for v_id in range(n):
     #     # points before the bottom line
     #     if v_id % width < width - 1 and v_id < n - width:
     #         v_1 = v_id
@@ -48,21 +48,34 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     #         v_3 = v_id + width - 1
     #         add_face(v_1, v_2, v_3, faces)
 
-        if v_id % width == width - 1:
-            continue
-        # points before the bottom line
-        if v_id < n - width:
-            v_1 = v_id
-            v_2 = v_id + width
-            v_3 = v_id + 1
-            add_face(v_1, v_2, v_3, faces)
-        # points after the first line
-        if v_id >= width:
-            v_1 = v_id
-            v_2 = v_id + 1
-            v_3 = v_id - (width - 1)
-            add_face(v_1, v_2, v_3, faces)
+        # # Original ver.
+        # if v_id % width == width - 1:
+        #     continue
+        # # points before the bottom line
+        # if v_id < n - width:
+        #     v_1 = v_id
+        #     v_2 = v_id + width
+        #     v_3 = v_id + 1
+        #     add_face(v_1, v_2, v_3, faces)
+        # # points after the first line
+        # if v_id >= width:
+        #     v_1 = v_id
+        #     v_2 = v_id + 1
+        #     v_3 = v_id - (width - 1)
+        #     add_face(v_1, v_2, v_3, faces)
 
+    for i in range(height):
+        for j in range(width):
+            if i < height - 1 and j < width - 1:
+                v_1 = width * i + j
+                v_2 = width * i + j + 1
+                v_3 = width * (i + 1) + j + 1
+                add_face(v_1, v_2, v_3, faces) 
+
+                v_1 = width * i + j
+                v_2 = width * (i + 1) + j
+                v_3 = width * (i + 1) + j + 1
+                add_face(v_1, v_2, v_3, faces) 
 
 
     # fix top and bottom left corners
@@ -74,6 +87,27 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     fixed_points.append(0)
     fixed_points.append(bottom_left)
     return pd_model.PDModel(verts, faces, uvs, constraints=constraints, fixed_points=fixed_points)
+
+# TODO
+def generate_iso_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
+    n = width * height
+    width_gap = MAX_WIDTH_SIZE / width
+    height_gap = -MAX_HEIGHT_SIZE / height
+    fix_weight = 10000.0
+
+    verts = np.zeros((n, 3))
+    faces = []
+    constraints = []
+    fixed_points = []
+    uvs = np.zeros((n, 2))
+    for x in range(width):
+        for y in range(height):
+            verts[x + (y * width)] = np.array((x * width_gap -
+                                               MAX_WIDTH_SIZE / 2, y * height_gap + MAX_HEIGHT_SIZE / 2, 0))
+            uvs[x + (y * width)] = np.array(((x % width) /
+                                             width, 1 - (y % height) / height))
+
+
 
 
 def add_face(v_1, v_2, v_3, faces):
