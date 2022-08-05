@@ -33,6 +33,6 @@ class FixConstraint(Constraint):
         return np.identity(3)
 
     def calculate_constraint_global_matrix(self, mat):
-        A_T_A = self.A
+        A_T_A = np.identity(3)
         for i in range(3):
             mat[3 * self.v_ids + i, 3 * self.v_ids + i] += 1.0 * self.weight
