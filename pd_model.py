@@ -104,7 +104,7 @@ class PDModel:
             # Constraints
             for con in self.constraints:
                 # TODO
-                con.calculateRHS(self.rendering_verts, b, 1.0)
+                con.calculateRHS(self.rendering_verts, b, 10000.0)
 
             '''Global solve'''
             # q_1 = np.linalg.solve(self.global_matrix, b.flatten())
