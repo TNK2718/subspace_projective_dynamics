@@ -40,7 +40,7 @@ class ARAPpotential(Potential):
 
         dm = P_m.T * np.matrix((v3 - v1, v2 - v1, (0, 0, 0))).T
         
-        self.area = np.linalg.det(dm) / 2.0
+        self.area = np.linalg.det(dm[0:1, 0:1]) / 2.0
         print(self.area)
         self.dm_I = np.linalg.pinv(dm)
         self.A = self.A_matrix()
