@@ -110,9 +110,9 @@ class PDModel:
             # q_1 = np.linalg.solve(self.global_matrix, b.flatten())
             q_1 = self.inv_global_matrix.dot(b.flatten())
 
-            # for point in self.fixed_points:
-            #     for i in range(3):
-            #         q_1[3 * point + i] = self.ini_position[3 * point + i]
+            for point in self.fixed_points:
+                for i in range(3):
+                    q_1[3 * point + i] = self.ini_position[3 * point + i]
 
             self.rendering_verts = q_1.reshape((self.n, 3))
 
