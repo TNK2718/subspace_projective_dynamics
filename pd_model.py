@@ -114,7 +114,7 @@ class PDModel:
                 for i in range(3):
                     q_1[3 * point + i] = self.ini_position[3 * point + i]
 
-            self.rendering_verts = q_1.reshape((self.n, 3))
+            self.rendering_verts = q_1.reshape((self.n, 3)).copy()
 
             # break
             diff = np.linalg.norm((q_1 - q_0), ord=2)
@@ -127,7 +127,7 @@ class PDModel:
 
         self.velocities = ((q_1 - self.position)) / self.stepsize
         self.position = np.copy(q_1)
-        self.rendering_verts = q_1.reshape((self.n, 3))
+        self.rendering_verts = q_1.reshape((self.n, 3)).copy()
 
     def calculate_global_matrix(self):
         rslt = np.copy(self.mass_matrix)
