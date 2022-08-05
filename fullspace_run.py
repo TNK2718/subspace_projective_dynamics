@@ -116,7 +116,7 @@ def main(unused_argv):
         ax.set_title('Step %d' % (step))
         print('Step: %d' % (step))
         print(time.time() - start)
-        print(models[0].rendering_verts[0,:])
+        # print(models[0].rendering_verts[0,:])
 
         # save positions
         fullspace_traj[num,:] = model.position.T

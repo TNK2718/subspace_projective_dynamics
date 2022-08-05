@@ -30,7 +30,7 @@ class ARAPpotential(Potential):
         v1 = verts[points[0]]
         v2 = verts[points[1]]
         v3 = verts[points[2]]
-        
+
         P_m = np.zeros((3, 3))
         edge1 = v3 - v1
         edge2 = v2 - v1
@@ -88,6 +88,7 @@ class ARAPpotential(Potential):
 
     def clamped_svd_for_matrix(self, matrix):
         u, s, v_t = np.linalg.svd(matrix)
+        print(s)
         s = np.diag(np.clip(s, self.s_min, self.s_max))
         # return np.around(u.dot(s).dot(v_t), 11)
         return u.dot(s).dot(v_t)
