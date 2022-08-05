@@ -101,18 +101,18 @@ class PDModel:
                 avg_mass /= 3.0
                 potential.calculateRHS(self.rendering_verts, b, avg_mass)
 
-            # # Constraints
-            # for con in self.constraints:
-            #     # TODO
-            #     con.calculateRHS(self.rendering_verts, b, 10000.0)
+            # Constraints
+            for con in self.constraints:
+                # TODO
+                con.calculateRHS(self.rendering_verts, b, 10000.0)
 
             '''Global solve'''
             # q_1 = np.linalg.solve(self.global_matrix, b.flatten())
             q_1 = self.inv_global_matrix.dot(b.flatten())
 
-            for point in self.fixed_points:
-                for i in range(3):
-                    q_1[3 * point + i] = self.ini_position[3 * point + i].copy()
+            # for point in self.fixed_points:
+            #     for i in range(3):
+            #         q_1[3 * point + i] = self.ini_position[3 * point + i].copy()
 
             self.rendering_verts = q_1.copy().reshape((self.n, 3))
 
