@@ -112,7 +112,7 @@ class PDModel:
 
             for point in self.fixed_points:
                 for i in range(3):
-                    q_1[3 * point + i] = self.ini_position[3 * point + i]
+                    q_1[3 * point + i] = np.copy(self.ini_position[3 * point + i])
 
             self.rendering_verts = q_1.reshape((self.n, 3)).copy()
 
