@@ -1,9 +1,11 @@
+from termios import VDISCARD
 import pd_model
 import face
 import constraint
 
 import numpy.linalg as linalg
 import numpy as np
+import math
 
 '''For geometry initialization.
 Building plane, loading obj file(TODO), etc.
@@ -70,13 +72,12 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
                 v_1 = width * i + j
                 v_2 = width * i + j + 1
                 v_3 = width * (i + 1) + j + 1
-                add_face(v_1, v_2, v_3, faces) 
+                add_face(v_1, v_2, v_3, faces)
 
                 v_1 = width * i + j
                 v_2 = width * (i + 1) + j
                 v_3 = width * (i + 1) + j + 1
-                add_face(v_1, v_2, v_3, faces) 
-
+                add_face(v_1, v_2, v_3, faces)
 
     # fix top and bottom left corners
     add_fix_constraint(n, verts, 0, fix_weight, constraints)
@@ -89,6 +90,8 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     return pd_model.PDModel(verts, faces, uvs, constraints=constraints, fixed_points=fixed_points)
 
 # TODO
+
+
 def generate_iso_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     n = width * height
     width_gap = MAX_WIDTH_SIZE / width
@@ -100,14 +103,59 @@ def generate_iso_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     constraints = []
     fixed_points = []
     uvs = np.zeros((n, 2))
-    for x in range(width):
-        for y in range(height):
-            verts[x + (y * width)] = np.array((x * width_gap -
-                                               MAX_WIDTH_SIZE / 2, y * height_gap + MAX_HEIGHT_SIZE / 2, 0))
-            uvs[x + (y * width)] = np.array(((x % width) /
-                                             width, 1 - (y % height) / height))
 
+    # for x in range(width):
+    #     for y in range(height):
+    #         verts[x + (y * width)] = np.array((x * width_gap -
+    #                                            MAX_WIDTH_SIZE / 2, y * height_gap + MAX_HEIGHT_SIZE / 2, 0))
+    #         uvs[x + (y * width)] = np.array(((x % width) /
+    #                                          width, 1 - (y % height) / height))
 
+    for v_id in range(n):
+        if v_id % (2 * width + 1) >= (width + 1):
+            x = math.sqrt(2) * width_gap * (v_id // (2 * width + 1) + 0.5)
+            y = math.sqrt(2) * width_gap * (v_id % (2 * width + 1) -
+                                            (width + 1)) - math.sqrt(2) * 0.5 * width_gap
+            z = 0.0
+            verts[v_id] = np.array((x, y, z))
+        else:
+            x = math.sqrt(2) * width_gap * (v_id // (2 * width + 1))
+            y = math.sqrt(2) * width_gap * (v_id %
+                                            (2 * width + 1)) - math.sqrt(2) * width_gap
+            z = 0.0
+            verts[v_id] = np.array((x, y, z))
+
+    for i in range(height):
+        for j in range(width):
+            v_1 = (2 * width + 1) * i + j
+            v_2 = (2 * width + 1) * i + j + 1
+            v_3 = (2 * width + 1) * i + j + width + 1
+            add_face(v_1, v_2, v_3, faces)
+
+            v_1 = (2 * width + 1) * i + j
+            v_2 = (2 * width + 1) * i + j + width + 1
+            v_3 = (2 * width + 1) * i + j + 2 * width + 1
+            add_face(v_1, v_2, v_3, faces)
+
+            v_1 = (2 * width + 1) * i + j + 1
+            v_2 = (2 * width + 1) * i + j + 2 * width + 2
+            v_3 = (2 * width + 1) * i + j + width + 1
+            add_face(v_1, v_2, v_3, faces)
+
+            v_1 = (2 * width + 1) * i + j + width + 1
+            v_2 = (2 * width + 1) * i + j + 2 * width + 2
+            v_3 = (2 * width + 1) * i + j + 2 * width + 1
+            add_face(v_1, v_2, v_3, faces)
+
+    # fix top and bottom left corners
+    add_fix_constraint(n, verts, 0, fix_weight, constraints)
+    bottom_left = width * (height - 1)
+    add_fix_constraint(
+        n, verts, bottom_left, fix_weight, constraints)
+
+    fixed_points.append(0)
+    fixed_points.append(bottom_left)
+    return pd_model.PDModel(verts, faces, uvs, constraints=constraints, fixed_points=fixed_points)
 
 
 def add_face(v_1, v_2, v_3, faces):
