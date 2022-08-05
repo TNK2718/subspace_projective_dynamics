@@ -48,6 +48,8 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     #         v_3 = v_id + width - 1
     #         add_face(v_1, v_2, v_3, faces)
 
+        if v_id % width == width - 1:
+            continue
         # points before the bottom line
         if v_id < n - width:
             v_1 = v_id

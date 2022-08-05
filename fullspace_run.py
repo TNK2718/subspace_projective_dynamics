@@ -33,7 +33,7 @@ fullspace_data_path = os.path.join(data_dir, 'fullspace_traj.npz')
 pca_base_path = os.path.join(data_dir, 'pca_base.npz')
 
 '''Paramters'''
-pca_dim = 2
+pca_dim = 10
 # geometry: flag
 res_w = 5
 res_h = 3
