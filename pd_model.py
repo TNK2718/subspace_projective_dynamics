@@ -39,7 +39,7 @@ class PDModel:
         self.stepsize = 0.1
         self.drag = 1.00
         self.max_iter = 10
-        self.eps_n = 0.01  # epsilon for local-global loop(nonlinear solver)
+        self.eps_n = 0.001  # epsilon for local-global loop(nonlinear solver)
 
         '''Constraints'''
         # Inner Potential
@@ -104,7 +104,7 @@ class PDModel:
             # Constraints
             for con in self.constraints:
                 # TODO
-                con.calculateRHS(self.rendering_verts, b, 10000000000.0)
+                con.calculateRHS(self.rendering_verts, b, 0.0)
 
             '''Global solve'''
             # q_1 = np.linalg.solve(self.global_matrix, b.flatten())

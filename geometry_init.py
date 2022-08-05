@@ -17,7 +17,7 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     n = width * height
     width_gap = MAX_WIDTH_SIZE / width
     height_gap = -MAX_HEIGHT_SIZE / height
-    fix_weight = 1.0
+    fix_weight = 10000.0
 
     verts = np.zeros((n, 3))
     faces = []
@@ -55,13 +55,13 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
             v_1 = v_id
             v_2 = v_id + width
             v_3 = v_id + 1
-            add_face(v_3, v_2, v_1, faces)
+            add_face(v_1, v_2, v_3, faces)
         # points after the first line
         if v_id >= width:
             v_1 = v_id
             v_2 = v_id + 1
             v_3 = v_id - (width - 1)
-            add_face(v_3, v_2, v_1, faces)
+            add_face(v_1, v_2, v_3, faces)
 
 
 
