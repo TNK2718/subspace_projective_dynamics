@@ -124,6 +124,7 @@ class PDModel:
         self.velocities = ((q_1 - self.position)) / self.stepsize
         self.position = np.copy(q_1)
         self.rendering_verts = q_1.copy().reshape((self.n, 3))
+        print(self.rendering_verts[self.fixed_points[0], :])
 
     def calculate_global_matrix(self):
         rslt = np.copy(self.mass_matrix)
