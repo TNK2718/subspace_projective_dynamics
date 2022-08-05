@@ -55,13 +55,13 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
             v_1 = v_id
             v_2 = v_id + width
             v_3 = v_id + 1
-            add_face(v_1, v_2, v_3, faces)
+            add_face(v_3, v_2, v_1, faces)
         # points after the first line
         if v_id >= width:
             v_1 = v_id
             v_2 = v_id + 1
             v_3 = v_id - (width - 1)
-            add_face(v_1, v_2, v_3, faces)
+            add_face(v_3, v_2, v_1, faces)
 
 
 
