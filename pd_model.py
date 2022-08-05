@@ -38,7 +38,7 @@ class PDModel:
         '''Solver option'''
         self.stepsize = 0.3
         self.drag = 1.00
-        self.max_iter = 1
+        self.max_iter = 10
         self.eps_n = 0.01  # epsilon for local-global loop(nonlinear solver)
 
         '''Constraints'''
@@ -89,7 +89,7 @@ class PDModel:
 
         for iter in range(self.max_iter):
             q_0 = np.copy(q_1)
-            b = b_0
+            b = np.copy(b_0)
 
             '''Local solve'''
             # Triangle potential
