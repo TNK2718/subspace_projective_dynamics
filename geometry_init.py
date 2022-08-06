@@ -9,17 +9,15 @@ import math
 
 '''For geometry initialization.
 Building plane, loading obj file(TODO), etc.
-
-https://github.com/TanaTanoi/lets-get-physical-simluation
+Returns PD solver model
 '''
-
 
 def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
 
     n = width * height
     width_gap = MAX_WIDTH_SIZE / width
     height_gap = -MAX_HEIGHT_SIZE / height
-    fix_weight = 10000.0
+    fix_weight = 100000.0
 
     verts = np.zeros((n, 3))
     faces = []
@@ -96,7 +94,7 @@ def generate_iso_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     n = (2 * width + 1) * height + width + 1
     width_gap = MAX_WIDTH_SIZE / width
     height_gap = -MAX_HEIGHT_SIZE / height
-    fix_weight = 10000.0
+    fix_weight = 100000.0
 
     verts = np.zeros((n, 3))
     faces = []
