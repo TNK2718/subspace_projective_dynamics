@@ -1,3 +1,4 @@
+from email.mime import base
 import time
 from matplotlib.cbook import flatten
 import numpy as np
@@ -9,9 +10,9 @@ import math
 
 np.set_printoptions(linewidth=2000)
 
-'''Projective Dynamics'''
-class PDModel:
-    def __init__(self, verts, faces, uvs=[], constraints=[], dyn_forces=[], fixed_points=[]):
+'''Semi-Reduced Projective Dynamics'''
+class SubPDModel:
+    def __init__(self, verts, faces, base_mat, center, uvs=[], constraints=[], dyn_forces=[], fixed_points=[]):
         '''Geometry'''
         self.n = len(verts)
         self.verts = verts
@@ -22,13 +23,6 @@ class PDModel:
             self.rendering_faces[i, 0] = self.faces[i].v1
             self.rendering_faces[i, 1] = self.faces[i].v2
             self.rendering_faces[i, 2] = self.faces[i].v3
-        # self.verts_to_tri = []
-        # for i in range(self.n):
-        #     in_faces = []
-        #     for face in self.faces:
-        #         if i in face.vertex_ids():
-        #             in_faces.append(face)
-        #     self.verts_to_tri.append(in_faces)
         self.uvs = uvs
         self.fixed_points = fixed_points
         self.mass_matrix = np.identity(3 * self.n)  # TODO
@@ -51,7 +45,7 @@ class PDModel:
         # Constraint
         self.constraints = constraints
 
-        '''Variables'''
+        '''Variables: fullspace'''
         self.count = 0
         self.position = verts.flatten()
         self.ini_position = np.copy(self.position)
@@ -66,7 +60,12 @@ class PDModel:
         gravity[:, 2] = -9.8 * self.mass_matrix[0, 0]  # TODO
         self.stat_forces += gravity.flatten()
 
-        # self.wind_magnitude = 5
+        '''Variables: subspace'''
+        self.U = base_mat
+        self.center = center
+        self.sub_position = self.to_subspace(self.position)
+        self.sub_velocities = self.U.T.dot(self.velocities)
+
 
     def simulate(self):
         ''' Forces'''
@@ -137,3 +136,9 @@ class PDModel:
             constraint.calculate_constraint_global_matrix(rslt)
 
         return rslt
+
+    def to_subspace(self, full_pos):
+        return
+
+    def to_fullspace(self, sub_pos):
+        return

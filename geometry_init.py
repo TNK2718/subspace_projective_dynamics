@@ -87,9 +87,8 @@ def generate_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     fixed_points.append(bottom_left)
     return pd_model.PDModel(verts, faces, uvs, constraints=constraints, fixed_points=fixed_points)
 
+
 # TODO
-
-
 def generate_iso_plane(width, height, MAX_WIDTH_SIZE=0.5, MAX_HEIGHT_SIZE=0.3):
     n = (2 * width + 1) * height + width + 1
     width_gap = MAX_WIDTH_SIZE / width
