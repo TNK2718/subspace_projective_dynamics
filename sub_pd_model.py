@@ -132,7 +132,7 @@ class SubPDModel:
             self.p_term_snapshot = np.copy(p_term)
 
             '''Global solve in subspace'''
-            sub_q_1 = self.inv_global_matrix.dot(sub_b.flatten())
+            sub_q_1 = self.sub_inv_global_mat.dot(sub_b.flatten())
 
             self.position = self.to_fullspace(sub_q_1)
             self.rendering_verts = self.position.copy().reshape((self.n, 3))
