@@ -141,7 +141,7 @@ def main(unused_argv):
 
     '''Construct PCA base'''
     pca_rslt = construct_base(fullspace_traj, pca_dim)
-    components = pca_rslt.components_
+    components = pca_rslt.components_.T
     mean = np.mean(fullspace_traj, axis=0)
 
     np.savez(os.path.join(data_dir, 'pca_base.npz'), base=components, mean=mean)
