@@ -129,7 +129,7 @@ class SubPDModel:
                 con.calculateRHS(self.rendering_verts, p_term, 0.0)
             
             sub_b += self.U.T @ p_term
-            self.p_term_snapshot = np.copy(p_term)
+            self.p_term_snapshot = self.U.T @ p_term
 
             '''Global solve in subspace'''
             sub_q_1 = self.sub_inv_global_mat.dot(sub_b.flatten())
