@@ -136,7 +136,7 @@ def main(unused_argv):
     ani = animation.FuncAnimation(
         fig, animate, frames=num_frames)
 
-    ani.save(os.path.join(rollout_dir, 'fullspace_traj.mp4'), writer="ffmpeg")
+    ani.save(os.path.join(rollout_dir, 'fullspace_rollout.mp4'), writer="ffmpeg")
     plt.show(block=True)
 
     '''Construct PCA base'''
