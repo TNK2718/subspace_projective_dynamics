@@ -72,7 +72,7 @@ class SubPDModel:
         self.sub_M = self.U.T @ self.mass_matrix @ self.U / \
             (self.stepsize * self.stepsize)
         self.sub_inv_mass_mat = self.U.T @ self.inv_mass_matrix @ self.U
-        self.sub_fict_force = self.U.T @ (self.sub_M - self.global_matrix) @ self.center
+        self.sub_fict_force = self.U.T @ (self.mass_matrix / (self.stepsize * self.stepsize) - self.global_matrix) @ self.center
 
         '''For data generation'''
         # TODO
