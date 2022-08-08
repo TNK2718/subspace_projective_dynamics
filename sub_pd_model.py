@@ -16,7 +16,7 @@ class SubPDModel:
         self.n = len(verts)
         self.r = base_mat.shape[1] # subspace dim
         print(base_mat.shape)
-        assert self.n == base_mat.shape[0]
+        assert 3 * self.n == base_mat.shape[0]
         self.verts = verts
         self.rendering_verts = np.copy(verts)
         self.faces = faces
