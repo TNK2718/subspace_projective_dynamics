@@ -65,6 +65,9 @@ class SubPDModel:
         self.center = center
         self.sub_position = self.to_subspace(self.position)
         self.sub_velocities = self.U.T.dot(self.velocities)
+        self.sub_global_mat
+        self.sub_mass_mat
+        self.sub_
 
 
     def simulate(self):
