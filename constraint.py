@@ -22,7 +22,7 @@ class FixConstraint(Constraint):
     def __init__(self, number_of_verts, verts, v_id, weight):
         super().__init__(number_of_verts, verts, v_id, weight)
         self.A = self.A_matrix()
-        self.ini_pos = verts[v_id, :]
+        self.ini_pos = verts[v_id, :].copy()
 
     def calculateRHS(self, verts, b, mass):
         projection = self.ini_pos * self.weight  # I^TIp = p
@@ -33,6 +33,6 @@ class FixConstraint(Constraint):
         return np.identity(3)
 
     def calculate_constraint_global_matrix(self, mat):
-        A_T_A = self.A
+        A_T_A = np.identity(3)
         for i in range(3):
             mat[3 * self.v_ids + i, 3 * self.v_ids + i] += 1.0 * self.weight

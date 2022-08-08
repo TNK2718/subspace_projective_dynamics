@@ -9,7 +9,7 @@ import math
 
 np.set_printoptions(linewidth=2000)
 
-
+'''Projective Dynamics'''
 class PDModel:
     def __init__(self, verts, faces, uvs=[], constraints=[], dyn_forces=[], fixed_points=[]):
         '''Geometry'''
@@ -22,29 +22,32 @@ class PDModel:
             self.rendering_faces[i, 0] = self.faces[i].v1
             self.rendering_faces[i, 1] = self.faces[i].v2
             self.rendering_faces[i, 2] = self.faces[i].v3
-        self.verts_to_tri = []
-        for i in range(self.n):
-            in_faces = []
-            for face in self.faces:
-                if i in face.vertex_ids():
-                    in_faces.append(face)
-            self.verts_to_tri.append(in_faces)
+        # self.verts_to_tri = []
+        # for i in range(self.n):
+        #     in_faces = []
+        #     for face in self.faces:
+        #         if i in face.vertex_ids():
+        #             in_faces.append(face)
+        #     self.verts_to_tri.append(in_faces)
         self.uvs = uvs
         self.fixed_points = fixed_points
+        self.mass_matrix = np.identity(3 * self.n)  # TODO
+        self.mass_matrix /= (len(self.faces))
+        self.inv_mass_matrix = np.identity(3 * self.n)  # TODO
 
         '''Solver option'''
-        self.stepsize = 0.3
+        self.stepsize = 0.1
         self.drag = 1.00
         self.max_iter = 10
-        self.eps_n = 0.01  # epsilon for local-global loop(nonlinear solver)
+        self.eps_n = 0.001  # epsilon for local-global loop(nonlinear solver)
 
         '''Constraints'''
         # Inner Potential
-        self.potential_weight = 1.0
+        self.potential_weight = 2.0
         self.potentials = []
         for face in self.faces:
             self.potentials.append(potential.ARAPpotential(
-                self.n, self.verts, face, self.potential_weight, 1.0, 0.0))
+                self.n, self.rendering_verts, face, self.potential_weight, 1.0, 0.0))
         # Constraint
         self.constraints = constraints
 
@@ -53,9 +56,6 @@ class PDModel:
         self.position = verts.flatten()
         self.ini_position = np.copy(self.position)
         self.velocities = np.zeros((3 * self.n))
-        self.mass_matrix = np.identity(3 * self.n)  # TODO
-        self.mass_matrix /= (len(self.faces))
-        self.inv_mass_matrix = np.identity(3 * self.n)  # TODO
         self.global_matrix = self.calculate_global_matrix()
         self.inv_global_matrix = np.linalg.inv(self.global_matrix)
 
@@ -89,7 +89,7 @@ class PDModel:
 
         for iter in range(self.max_iter):
             q_0 = np.copy(q_1)
-            b = b_0
+            b = np.copy(b_0)
 
             '''Local solve'''
             # Triangle potential
@@ -104,17 +104,17 @@ class PDModel:
             # Constraints
             for con in self.constraints:
                 # TODO
-                con.calculateRHS(self.rendering_verts, b, 1.0)
+                con.calculateRHS(self.rendering_verts, b, 0.0)
 
             '''Global solve'''
             # q_1 = np.linalg.solve(self.global_matrix, b.flatten())
             q_1 = self.inv_global_matrix.dot(b.flatten())
 
-            for point in self.fixed_points:
-                for i in range(3):
-                    q_1[3 * point + i] = self.ini_position[3 * point + i]
+            # for point in self.fixed_points:
+            #     for i in range(3):
+            #         q_1[3 * point + i] = self.ini_position[3 * point + i].copy()
 
-            self.rendering_verts = q_1.reshape((self.n, 3))
+            self.rendering_verts = q_1.copy().reshape((self.n, 3))
 
             # break
             diff = np.linalg.norm((q_1 - q_0), ord=2)
@@ -123,32 +123,17 @@ class PDModel:
 
         self.velocities = ((q_1 - self.position)) / self.stepsize
         self.position = np.copy(q_1)
-        self.rendering_verts = q_1.reshape((self.n, 3))
+        self.rendering_verts = q_1.copy().reshape((self.n, 3))
+        print(self.rendering_verts[self.fixed_points[0], :])
 
     def calculate_global_matrix(self):
         rslt = np.copy(self.mass_matrix)
         rslt /= (self.stepsize * self.stepsize)
 
         for potential in self.potentials:
-            # print(time.time())
-            # points = potential.face.vertex_ids()
-            # avg_inv_mass = 0.0
-            # for i in range(3):
-            #     avg_inv_mass += self.inv_mass_matrix[3 * points[i], 3 * points[i]]
-            # avg_inv_mass /= 3.0
-            # S = potential.S_matrix()
-            # rslt += avg_inv_mass * S.T @ potential.A.T @ potential.A @ S
             potential.calculate_triangle_global_matrix(rslt)
 
         for constraint in self.constraints:
             constraint.calculate_constraint_global_matrix(rslt)
-        # for constraint in self.constraints:
-        #     points = constraint.face.vertex_ids()
-        #     avg_inv_mass = 0.0
-        #     for i in range(3):
-        #         avg_inv_mass += self.inv_mass_matrix[points[i], points[i]]
-        #     avg_inv_mass /= 3.0
-        #     S = constraint.S_matrix()
-        #     rslt += avg_inv_mass * S.T * constraint.A.T * constraint.A * S
 
         return rslt

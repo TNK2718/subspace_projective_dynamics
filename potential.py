@@ -30,8 +30,18 @@ class ARAPpotential(Potential):
         v1 = verts[points[0]]
         v2 = verts[points[1]]
         v3 = verts[points[2]]
-        dm = np.matrix((v3 - v1, v2 - v1, (0, 0, 0))).T
+
+        P_m = np.zeros((3, 2))
+        edge1 = v2 - v1
+        edge2 = v3 - v1
+        P_m[:, 0] = (edge1) / np.linalg.norm(edge1)
+        P_m[:, 1] = edge2 - edge2.dot(P_m[:, 0]) * P_m[:, 0]
+        P_m[:, 1] /= np.linalg.norm(P_m[:,1])
+
+        dm = P_m.T * np.matrix((edge1, edge2)).T
+        
         self.area = np.linalg.det(dm) / 2.0
+        # print(self.area)
         self.dm_I = np.linalg.pinv(dm)
         self.A = self.A_matrix()
 
@@ -41,15 +51,23 @@ class ARAPpotential(Potential):
         v1 = verts[points[0]]
         v2 = verts[points[1]]
         v3 = verts[points[2]]
-        ds = np.matrix((v3 - v1, v2 - v1, (0, 0, 0))).T
+
+        P_s = np.zeros((3, 2))
+        edge1 = v2 - v1
+        edge2 = v3 - v1
+        P_s[:, 0] = (edge1) / np.linalg.norm(edge1)
+        P_s[:, 1] = edge2 - edge2.dot(P_s[:, 0]) * P_s[:, 0]
+        P_s[:, 1] /= np.linalg.norm(P_s[:,1])
+
+        ds = P_s.T * np.matrix((edge1, edge2)).T
         combined = ds.dot(self.dm_I)
-        projection = self.clamped_svd_for_matrix(combined).flatten()
-        projection = self.A.T.dot(projection.T) * self.weight
+        projection = (P_s * self.clamped_svd_for_matrix(combined)).flatten(order='F')
+        projection = self.A.T.dot(projection.T) * self.weight * math.sqrt(abs(self.area))
         for i in range(9):
             b[3 * points[i // 3] + i % 3] += projection[i]
 
     def A_matrix(self):
-        rslt = np.zeros((9, 9))  # TODO
+        rslt = np.zeros((6, 9))  # TODO
         for i in range(2):
             for j in range(3):
                 rslt[3 * i + j, 3 * 0 + j] = - \
@@ -62,7 +80,7 @@ class ARAPpotential(Potential):
         return rslt
 
     def calculate_triangle_global_matrix(self, mat):
-        A_T_A = self.A.T * self.A
+        A_T_A = self.A.T @ self.A
         points = self.face.vertex_ids()
         for i in range(9):
             for j in range(9):
