@@ -77,8 +77,8 @@ def main(unused_argv):
     start = time.time()
 
     # Trajectory of a cloth
-    sub_s_0_traj = np.zeros((num_frames, 3 * models[0].r))
-    sub_p_term_traj = np.zeros((num_frames, 3 * models[0].r))
+    sub_s_0_traj = np.zeros((num_frames, models[0].r))
+    sub_p_term_traj = np.zeros((num_frames, models[0].r))
 
     def animate(num):
         step = (num * skip) % num_steps
