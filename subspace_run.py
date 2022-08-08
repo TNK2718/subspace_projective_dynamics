@@ -1,4 +1,4 @@
-"""Data generation via fullspace projective dynamics rollouts"""
+"""Semi-reduced projective dynamics in PCA-subspace"""
 import time
 import os
 import pickle
@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import math
-import pd_model
+import sub_pd_model
 import geometry_init
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
@@ -20,6 +20,7 @@ from sklearn.decomposition import PCA
 #
 dataset_name = 'flag_test'
 rollout_name = '1'
+geometry_func = geometry_init.generate_plane
 
 #
 root_dir = pathlib.Path(__file__).parent.resolve()
@@ -29,7 +30,7 @@ rollout_dir = os.path.join(output_dir, 'rollout')
 data_dir = os.path.join(root_dir, 'data', dataset_name)
 
 #
-fullspace_data_path = os.path.join(data_dir, 'fullspace_traj.npz')
+# fullspace_data_path = os.path.join(data_dir, 'fullspace_traj.npz')
 pca_base_path = os.path.join(data_dir, 'pca_base.npz')
 
 '''Paramters'''
@@ -44,47 +45,23 @@ skip = 1
 num_steps = 500
 num_frames = num_steps
 
+def load_base(dir):
+    ndarr = np.load(os.path.join(dir, 'pca_base.npz'))
+    base = ndarr['base']
+    center = ndarr['mean']
+    return (base, center)
+
 def prepare_files_and_directories():
     # make all the necessary directories
     Path(rollout_dir).mkdir(parents=True, exist_ok=True)
     Path(data_dir).mkdir(parents=True, exist_ok=True)
-
-def construct_base(traj, n):
-    scaler = StandardScaler(with_std=False)
-    pos_scaled = scaler.fit_transform(traj)
-
-    # TODO: Whiten?
-    # Whitening doesnt seem to matter to the result in terms of dimensionally reduction
-    pca_pos = PCA(n_components=n, whiten=False)
-    pca_pos.fit(pos_scaled)
-
-    # Show Explained variance ratio
-    plt.figure()
-    plt.plot(np.hstack([0, pca_pos.explained_variance_ratio_]).cumsum(), 'o-')
-    plt.xticks(range(5))
-    plt.xlabel('Components')
-    plt.ylabel('Explained variance ratio')
-    plt.grid()
-    plt.savefig(os.path.join(data_dir, 'posExpVarRatio.png'))
-
-    # projection to PC1 PC2 space
-    feature_pos = pca_pos.transform(traj)
-    # 
-    plt.figure(figsize=(6, 6))
-    plt.scatter(feature_pos[:, 0], feature_pos[:, 1], alpha=0.8)
-    plt.grid()
-    plt.xlabel("PC1")
-    plt.ylabel("PC2")
-    plt.savefig(os.path.join(data_dir, 'fullspace_traj_projection.png'))
-
-    return pca_pos
 
 def main(unused_argv):
     #
     prepare_files_and_directories()
     
     #
-    print('fullspace rollout starting...')
+    print('Subspace rollout starting...')
 
     fig = plt.figure(figsize=(19.2, 10.8))
     ax = fig.add_subplot(111, projection='3d')
@@ -92,12 +69,16 @@ def main(unused_argv):
     # Setup solvers
     models = []
 
+    # Load base matrix
+    sub_args = load_base(data_dir)
+
     # models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
-    models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
+    models.append(sub_pd_model.SubPDModel(*geometry_func(res_w, res_h, len_w, len_h), *sub_args))
     start = time.time()
 
     # Trajectory of a cloth
-    fullspace_traj = np.zeros((num_frames, 3 * models[0].n))
+    sub_s_0_traj = np.zeros((num_frames, 3 * models[0].r))
+    sub_p_term_traj = np.zeros((num_frames, 3 * models[0].r))
 
     def animate(num):
         step = (num * skip) % num_steps
@@ -120,7 +101,8 @@ def main(unused_argv):
         # print(models[0].rendering_verts[0,:])
 
         # save positions
-        fullspace_traj[num,:] = np.copy(model.position)
+        sub_s_0_traj[num, :] = np.copy(model.sub_s_0_snapshot)
+        sub_p_term_traj[num, :] = np.copy(model.p_term_snapshot)
 
         # advance time
         for _ in range(skip):
@@ -138,13 +120,8 @@ def main(unused_argv):
     ani.save(os.path.join(rollout_dir, 'fullspace_traj.mp4'), writer="ffmpeg")
     plt.show(block=True)
 
-    '''Construct PCA base'''
-    pca_rslt = construct_base(fullspace_traj, pca_dim)
-    components = pca_rslt.components_
-    mean = np.mean(fullspace_traj, axis=0)
-
-    np.savez(os.path.join(data_dir, 'pca_base.npz'), base=components, mean=mean)
-
+    '''Save trajectory'''
+    np.savez(os.path.join(data_dir, 'subspace_traj.npz'), s_0=sub_s_0_traj, p_term=sub_p_term_traj)
 
 if __name__ == '__main__':
     app.run(main)

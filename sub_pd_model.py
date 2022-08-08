@@ -1,4 +1,3 @@
-from email.mime import base
 import time
 from matplotlib.cbook import flatten
 import numpy as np
@@ -11,12 +10,12 @@ import math
 np.set_printoptions(linewidth=2000)
 
 '''Semi-Reduced Projective Dynamics'''
-
-
 class SubPDModel:
-    def __init__(self, verts, faces, base_mat, center, uvs=[], constraints=[], dyn_forces=[], fixed_points=[]):
+    def __init__(self, verts, faces, uvs=[], constraints=[], dyn_forces=[], fixed_points=[], base_mat=None, center=None):
         '''Geometry'''
         self.n = len(verts)
+        self.r = base_mat.shape[1] # subspace dim
+        assert self.n == base_mat.shape[0]
         self.verts = verts
         self.rendering_verts = np.copy(verts)
         self.faces = faces
@@ -26,7 +25,7 @@ class SubPDModel:
             self.rendering_faces[i, 1] = self.faces[i].v2
             self.rendering_faces[i, 2] = self.faces[i].v3
         self.uvs = uvs
-        self.fixed_points = fixed_points
+        # self.fixed_points = fixed_points
         self.mass_matrix = np.identity(3 * self.n)  # TODO
         self.mass_matrix /= (len(self.faces))
         self.inv_mass_matrix = np.identity(3 * self.n)  # TODO
@@ -74,11 +73,17 @@ class SubPDModel:
         self.sub_inv_mass_mat = self.U.T @ self.inv_mass_matrix @ self.U
         self.sub_fict_force = self.U.T @ (self.sub_M - self.global_matrix) @ self.center
 
+        '''For data generation'''
+        # TODO
+        self.sub_s_0_snapshot = None
+        self.p_term_snapshot = None
+
     def simulate(self):
         '''
         Forces
+
         TODO: Perform solely in subspace
-        Dynamic forces and collisions are evaluated in fullspace.
+        Currently, dynamic forces and collisions are evaluated in fullspace.
         '''
         forces = self.stat_forces
         for f in self.dyn_forces:
@@ -90,37 +95,24 @@ class SubPDModel:
         sub_inertia = self.sub_velocities * self.stepsize
         sub_s_0 = self.sub_position + sub_inertia + sub_accel
 
-        # accel = (self.stepsize * self.stepsize) * \
-        #     self.inv_mass_matrix.dot(forces)
-        # inertia = self.velocities * self.stepsize
-        # s_0 = self.position + inertia + accel
-
         '''Local global loop'''
         sub_q_1 = np.copy(sub_s_0)
         sub_b_0 = self.sub_M @ sub_s_0 + self.sub_fict_force
         sub_b = np.copy(sub_b_0)
-        
-        # q_1 = np.copy(s_0)
-        # b = np.zeros((3 * self.n))
-        # M = self.mass_matrix / (self.stepsize * self.stepsize)
-        # b_0 = M.dot(s_0)
-        # b = np.copy(b_0)
+        self.sub_s_0_snapshot = np.copy(sub_s_0)
 
         for iter in range(self.max_iter):
             sub_q_0 = np.copy(sub_q_1)
             sub_b = np.copy(sub_b_0)
 
-            # q_0 = np.copy(q_1)
-            # b = np.copy(b_0)
-
             '''
             Local solve in fullspace
             
             TODO: Perform local solve solely in subspace
-            HRPD[Brandt et al.2018] enables to perform local solve in subspace, leveraging sampled fullspace infomation.
+            Hyper-Reduced Projective Dynamics[Brandt et al.2018] enables to perform local solve in subspace, leveraging sampled fullspace information.
             However, this sampling-based method can not be applied to cloth simulation due to its high-frequency deformations.
             '''
-            vec = np.zeros((3 * self.n))
+            p_term = np.zeros((3 * self.n))
             # Triangle potential
             for potential in self.potentials:
                 points = potential.face.vertex_ids()
@@ -128,14 +120,15 @@ class SubPDModel:
                 for i in range(3):
                     avg_mass += self.mass_matrix[3 * points[i], 3 * points[i]]
                 avg_mass /= 3.0
-                potential.calculateRHS(self.rendering_verts, vec, avg_mass)
+                potential.calculateRHS(self.rendering_verts, p_term, avg_mass)
 
             # Constraints
             for con in self.constraints:
                 # TODO
-                con.calculateRHS(self.rendering_verts, vec, 0.0)
+                con.calculateRHS(self.rendering_verts, p_term, 0.0)
             
-            sub_b += self.U.T @ vec
+            sub_b += self.U.T @ p_term
+            self.p_term_snapshot = np.copy(p_term)
 
             '''Global solve in subspace'''
             sub_q_1 = self.inv_global_matrix.dot(sub_b.flatten())

@@ -20,6 +20,7 @@ from sklearn.decomposition import PCA
 #
 dataset_name = 'flag_test'
 rollout_name = '1'
+geometry_func = geometry_init.generate_plane
 
 #
 root_dir = pathlib.Path(__file__).parent.resolve()
@@ -29,7 +30,7 @@ rollout_dir = os.path.join(output_dir, 'rollout')
 data_dir = os.path.join(root_dir, 'data', dataset_name)
 
 #
-fullspace_data_path = os.path.join(data_dir, 'fullspace_traj.npz')
+# fullspace_data_path = os.path.join(data_dir, 'fullspace_traj.npz')
 pca_base_path = os.path.join(data_dir, 'pca_base.npz')
 
 '''Paramters'''
@@ -93,7 +94,7 @@ def main(unused_argv):
     models = []
 
     # models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
-    models.append(geometry_init.generate_plane(res_w, res_h, len_w, len_h))
+    models.append(pd_model.PDModel(*geometry_func(res_w, res_h, len_w, len_h)))
     start = time.time()
 
     # Trajectory of a cloth
