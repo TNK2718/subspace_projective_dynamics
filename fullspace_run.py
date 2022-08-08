@@ -34,10 +34,10 @@ data_dir = os.path.join(root_dir, 'data', dataset_name)
 pca_base_path = os.path.join(data_dir, 'pca_base.npz')
 
 '''Paramters'''
-pca_dim = 10
+pca_dim = 50
 # geometry: flag
-res_w = 5
-res_h = 3
+res_w = 50
+res_h = 30
 len_w = 1.5
 len_h = 0.9
 # Animation setting
